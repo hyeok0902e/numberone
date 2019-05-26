@@ -1,80 +1,52 @@
 const express = require('express');
 const bcrypt = require('bcrypt'); // 비밀번호 암호화 모듈
-const { User, UserPick, Attendance } = require('../models'); // address 추가 필요
-
+const moment = require('moment'); // Data formating 모듈
+const { Sequelize, User, UserPick, Attendance, Load } = require('../models/'); // address 추가 필요
+const { response } = require('./middlewares/response');
 const router = express.Router();
 
-router.get('/', (req, res, next) => {
-    const { val } = req.body;
-    if (val == 'hyeoke') {
-        return res.status(200).json({
-            resultCode: 200,
-            resultMessage: {
-                title: '성공',
-                message: '테스트 입니다.',
-            },
-            payLoad: {
-                key1: 'text',
-                key2: 'text2',
-            }
-        });
-    }
-});
+// for findAll using range
+const Op = Sequelize.Op;
 
-router.post('/create', async (req, res, next) => {
-    const { 
-        email, password, // 이메일, 비밀번호
-        fbUID, fbFCM, // Firebase UID & FCM Token
-        name, birth, gender, phone, task, // 이름, 생일, 성, 휴대폰, 직종
-        company, companyTel, fax, profile, // 회사명, 회사번호, 팩스, 프로필사진
-        level, // 회원등급
-        productAuth, productAuthPeriod, // 제품등록 권한 & 기간
-        marketAuth, marketAuthPeriod // 시세정보등록 권한 & 기간
-    } = req.body;
-    console.log(req.body);
+// Main(Home)
+router.get('/', async (req, res, next) => {
+    const { user_id } = req.query;
 
     try {
-        // test code
-  
-            const hash = await bcrypt.hash(password, 12); // 비밀번호 암호화
-            
-            // User 생성
-            const user = await User.create({
-                email, password: hash, // 이메일, 비밀번호
-                fbUID, fbFCM, // Firebase UID & FCM Token
-                name, birth: Date.now(), gender, phone, task, // 이름, 생일, 성, 휴대폰, 직종
-                company, companyTel, fax, profile, // 회사명, 회사번호, 팩스, 프로필사진
-                level, // 회원등급
-                productAuth, productAuthPeriod, // 제품등록 권한 & 기간
-                marketAuth, marketAuthPeriod // 시세정보등록 권한 & 기간
-            }) 
+        // 금일 날짜
+        const today = moment(Date.now()).format('YYYY-MM-DD');
 
-            res.status(201).json({
-                resultCode: 201,
-                resultMessage: {
-                    title: "작성됨",
-                    message: "성공적으로 요청되었으며 서버가 새 리소스를 작성했습니다."
-                },
-                payLoad: {
-                    user
-                },
-            });
-    
-    } catch (err) {
-        res.status(400).json({
-            resultCode: 400,
-            resultMessage: {
-                title: "잘못된 요청",
-                message: "서버가 요청의 구문을 인식하지 못했습니다."
-            },
-            payLoad: {},
+        // 금일 출석 명단 
+        const today_attendances = await Attendance.findAll({ 
+            where: { date: { [Op.gt]: moment(`${today}`)._d, } },
+            include: [{ model: User, attributes: ['id', 'name', 'gender', 'birth'] }],
+            order: [['date', 'DESC'],],
         });
+
+        if (user_id) {
+            const user = await User.findOne({ 
+                where: { id: user_id }, 
+                attributes: ['id', 'name', 'gender', 'birth'],
+            });
+
+            // 일치하는 유저 정보가 없을 때
+            if (!user) {
+                let payLoad = { today_attendances };
+                response(res, 404, "일치하는 유저 정보 없음", payLoad);  
+                return;
+            } 
+
+            // 유저가 로그인 되었 있을 때
+            let payLoad = { today_attendances, user };
+            response(res, 200, "로그인 된 유저 있음", payLoad);
+            return;
+        }
+
+        response(res, 200, "최초 접속");
+    } catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러");
     }
 });
-
-router.post('/attendance', (req, res, next) => {
-
-});
-
 
 module.exports = router;
