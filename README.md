@@ -26,20 +26,26 @@
 
 ### 2019.05.25(토)
     - models/company - 관리대장
-    - models/feeProject 
-    - models/statement
 
 ### 2019.05.26(일)
     - models/feeProject 
+    - models/statement
+    - routes/billProject
+    - models/jobSearch
 
 ## ToDo
 - image upload to s3
-
+- 만들어 놓은 exUser 미들웨어로 코드 교체
 
 ## 모델생성 및 관계세팅 진행률
     - company & paper - 100%
     - billProject - 90%
     - feeProject - 100%
     - statement - 100%
-    - jobSeaker
+    - jobSearch - 90% => 관계부분 좀 더 고민해 볼 것 (등록글 - 신청글)
     - Product
+
+## 오류/문제 해결 내용
+
+## 새로 배운 내용
+

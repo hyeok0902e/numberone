@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: false,
             defaultValue: 0,
         },
-        outputCE: { // 설비용량에 의한 계약전력 - 계약전력 계산시 저장 (kW)
+        outputCE: { // 설비용량에 의한 계약전력 (변압기계산의 사용자입력값 합계) - 계약전력 계산시 저장 (kVA)
             type: DataTypes.TINYINT(1),
             allowNull: false,
             defaultValue: 0,

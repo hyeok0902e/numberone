@@ -66,6 +66,11 @@ db.Statement = require('./statement/Statement')(sequelize, Sequelize);
 db.Process = require('./statement/Process')(sequelize, Sequelize);
 db.ProcessDetail = require('./statement/ProcessDetail')(sequelize, Sequelize);
 db.ProcessDetailElement = require('./statement/ProcessDetailElement')(sequelize, Sequelize);
+
+// JobSearch
+db.Hiring = require('./jobSearch/Hiring')(sequelize, Sequelize);
+db.Seeking = require('./jobSearch/Seeking')(sequelize, Sequelize);
+db.Labor = require('./jobSearch/Labor')(sequelize, Sequelize);
 /********************************* Initialize (End) *********************************/
 
 
@@ -230,6 +235,21 @@ db.Process.hasMany(db.ProcessDetail, { foreignKey: 'process_id', sourceKey: 'id'
 db.ProcessDetailElement.belongsTo(db.ProcessDetail, { foreignKey: 'processDetail_id', targetKey: 'id' });
 db.ProcessDetail.hasMany(db.ProcessDetailElement, { foreignKey: 'processDetail_id', sourceKey: 'id' });
 /************************* Relation About Statement (End) *************************/
+
+
+/************************ Relation About JobSearch (Start) ************************/
+db.Hiring.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
+db.User.hasMany(db.Hiring, { foreignKey: 'user_id', sourceKey: 'id' });
+
+db.Seeking.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
+db.User.hasMany(db.User, { foreignKey: 'user_id', sourceKey: 'id' });
+
+db.Labor.belongsTo(db.Hiring, { foreignKey: 'hiring_id', targetKey: 'id' });
+db.Hiring.hasMany(db.Labor, { foreignKey: 'hiring_id', sourceKey: 'id' });
+
+db.Labor.belongsTo(db.Seeking, { foreignKey: 'seeking_id', targetKey: 'id' });
+db.Seeking.hasMany(db.Labor, { foreignKey: 'seeking_id', sourceKey: 'id' });
+/************************* Relation About JobSearch (End) *************************/
 
 
 module.exports = db;
