@@ -29,6 +29,9 @@ const authRouter = require('./routes/user/auth.js');
 // billProject
 const billIndexRouter = require('./routes/billProject/index.js');
 const billMotorLoadRouter = require('./routes/billProject/motorload.js');
+
+// Load
+const bankRouter = require('./routes/billProject/bank.js');
 /*********************** Router (End) ***********************/
 
 const app = express();
@@ -73,6 +76,9 @@ app.use('/attendance', attendanceRouter);
 // billProject
 app.use('/bill/', billIndexRouter);
 app.use('/bill/motorLoad', billMotorLoadRouter); // 수정필요
+
+// Load
+app.use('/bill/bank', bankRouter);
 /*********************** Router URL (End) ***********************/
 
 app.use((req, res, next) => {

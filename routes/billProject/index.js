@@ -1,8 +1,13 @@
 const express = require('express');
 
+// 모델 import
 const { User, UserAuth, BillProject } = require('../../models');
+
+// 커스텀 미들웨어
 const { response } = require('../middlewares/response'); // 미들웨어: response to front
 const { exUser } = require('../middlewares/exUser'); // 미들웨어: user 존재여부 확인
+const { checkBillAuth } = require('../middlewares/userAuth');
+
 const router = express.Router();
 
 router.get('/', async (req, res, next) => { 
@@ -35,46 +40,43 @@ router.post('/create', async (req, res, next) => {
     try {
         const { name, voltType, user_id } = req.body;
 
-        if (user_id) {
+        if (!user_id) {
+            response(res, 400, "로그인 필요");
+            return;
+        }
+
+        if (!name || !voltType) {
+            response(res, 400, "정보를 제대로 입력해주세요.");
+            return;
+        }
+
+        if (await exUser(user_id)) {
+            // 유저 및 유저권한 가져오기
             const user = await User.findOne({ 
-                where: { id: user_id },
-                include: [{ model:UserAuth }], 
+                where: { id: user_id }, 
+                include: [{ model: UserAuth }], 
             });
 
-            if (!user) {
-                response(res, 404, "유저가 존재하지 않습니다.");
-                return;
-            }
-
-            if (!name || !voltType) {
-                response(res, 400, "정보를 제대로 입력해주세요.");
-                return;
-            }
-
-            if ((user.level != 0) && (user.UserAuth.period > 0) && (user.UserAuth.billProject > 0)) {
+            if (await checkBillAuth(user)) {
                 // 유저 정보 및 이용 권한이 있을 시, 계산서 프로젝트 생성
-                let billProject = await BillProject.create({ 
-                    name, 
-                    voltType,
-                });
+                let billProject = await BillProject.create({ name, voltType });   
                 await user.addBillProject(billProject);
-
+                
                 // 유저 권한 업데이트: 계산서 프로젝트 등록 횟수 -1
                 const userBillProjectAuth = user.UserAuth.billProject - 1;
                 await UserAuth.update(
                     { billProject: userBillProjectAuth },
                     { where: { user_id: user_id } },
-                );
+                );        
                 
-
-                let payLoad = { billProject, user_id };
+                let payLoad = { billProejct_id: billProject.id , user_id };
                 response(res, 201, '계산서 프로젝트 생성', payLoad);
             } else {
                 response(res, 400, "권한 없음");
             }
         } else {
-            response(res, 400, "로그인된 사용자 없음");
-        }    
+            response(res, 404, "유저가 존재하지 않습니다.");
+        }
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");
@@ -83,7 +85,7 @@ router.post('/create', async (req, res, next) => {
 
 router.get('/:billProject_id/edit', async (req, res, next) => {
     try {
-        const { user_id } = req.body; // query로 변경할 것 
+        const { user_id } = req.query; // query로 변경할 것 
         const { billProject_id } = req.params;
 
         if (!user_id) {

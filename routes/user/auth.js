@@ -1,7 +1,12 @@
 const express = require('express');
 const bcrypt = require('bcrypt'); // 비밀번호 암호화 모듈
+
+// 모델 import
 const { User, UserPick, Attendance } = require('../../models'); // address 추가 필요
+
+// 커스텀 미들웨어
 const { response } = require('../middlewares/response');
+const { exUser } = require('../middlewares/exUser'); // user 존재여부 확인
 
 const router = express.Router();
 
@@ -26,6 +31,18 @@ router.post('/signUp', async (req, res, next) => {
                 return;
             }
 
+            // 관심목록 입력 여부 체크
+            if ((!userPicks) || (userPicks == [])) {
+                response(res, 400, '관심품목을 선택해 주세요.');
+                return;
+            } 
+
+            // 주소를 입력하지 않았을 때 response 작성 필요!
+            // if (!address) {
+            //     response(res, 400, "주소를 입력해 주세요.");
+            //     return;
+            // }
+
             // 비밀번호 암호화
             const hash = await bcrypt.hash(password, 12); 
             
@@ -38,22 +55,11 @@ router.post('/signUp', async (req, res, next) => {
                 level, productAuth, marketAuth // 회원등급, 제품등록 권한, 시세정보등록 권한 
             }); 
 
-            if ((!userPicks) || (userPicks == [])) {
-                response(res, 400, '관심품목을 선택해 주세요.');
-                return;
-            } 
-
             // UserPick 생성
             userPicks.forEach(async (up) => {
                 let userPick = await UserPick.create({ name: up });
                 await user.addUserPick(userPick);
             });
-
-            // 주소를 입력하지 않았을 때 response 작성 필요!
-            // if (!address) {
-            //     response(res, 400, "주소를 입력해 주세요.");
-            //     return;
-            // }
             
             // 주소 생성 코드 작성 필요!
             // const address = await Address.create({ });
@@ -68,6 +74,7 @@ router.post('/signUp', async (req, res, next) => {
                 birth: user.birth,
                 gender: user.gender,
                 level: user.level,
+                // address: address.roadFullAddr
             };
             response(res, 201, "회원가입 성공", payLoad);
         } else {
@@ -147,13 +154,10 @@ router.get('/signOut', async (req, res) => {
             return;
         }
         
-        // 클라이언트 유저 가져오기
-        const user = await User.findOne({ where: { id: user_id }});
-        
-        if (user) {
-            // await req.logout();
-            // await req.session.destroy();
-            response(res, 200, "로그아웃 완료"); 
+        // 유저 존재여부 체크 및 로그아웃       
+        if (await exUser(user_id)) {
+            let payLoad = { user_id }
+            response(res, 200, "로그아웃 완료" , payLoad); 
         } else { // 유저정보가 올바르지 않을 때
             response(res, 404, "사용자가 존재하지 않습니다.");
         }

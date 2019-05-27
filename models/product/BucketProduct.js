@@ -1,10 +1,14 @@
 module.exports = (sequelize, DataTypes) => (
-    sequelize.define('Labor', {
-        major: { // 업무
+    sequelize.define('BucketProduct', {
+        name: { // 제품명
             type: DataTypes.STRING(255),
             allowNull: false,
         },
-        people: { // 인원수 
+        category: { // 카테고리
+            type: DataTypes.INTEGER(2),
+            allowNull: false,
+        },
+        product_id: { // 제품 id
             type: DataTypes.INTEGER(11),
             allowNull: false,
         },

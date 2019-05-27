@@ -10,8 +10,9 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 /******************************** Initialize (Start) ********************************/
-// 공통
+// 공통 및 기타
 db.Address = require('./Address')(sequelize, Sequelize);
+db.Announcement = require('./Announcement')(sequelize, Sequelize);
 
 // User
 db.User = require('./user/User')(sequelize, Sequelize);
@@ -71,6 +72,27 @@ db.ProcessDetailElement = require('./statement/ProcessDetailElement')(sequelize,
 db.Hiring = require('./jobSearch/Hiring')(sequelize, Sequelize);
 db.Seeking = require('./jobSearch/Seeking')(sequelize, Sequelize);
 db.Labor = require('./jobSearch/Labor')(sequelize, Sequelize);
+
+// Organization
+db.Organization = require('./organization/Organization')(sequelize, Sequelize);
+
+// Material
+db.Material = require('./material/Material')(sequelize, Sequelize);
+
+// Product
+db.Product = require('./product/Product')(sequelize, Sequelize);
+db.ProductOpt = require('./product/ProductOpt')(sequelize, Sequelize);
+db.ProductThumb = require('./product/ProductThumb')(sequelize, Sequelize);
+db.BucketProduct = require('./product/BucketProduct')(sequelize, Sequelize);
+db.BucketProductOpt = require('./product/BucketProduct')(sequelize, Sequelize);
+db.EstimateOfBucket = require('./product/EstimateOfBucket')(sequelize, Sequelize);
+
+// Document
+db.Document = require('./document/Document')(sequelize, Sequelize);
+
+// MarketPrice
+db.MarketPrice = require('./marketPrice/MarketPrice')(sequelize, Sequelize);
+db.MarketPriceOpt = require('./marketPrice/MarketPriceOpt')(sequelize, Sequelize);
 /********************************* Initialize (End) *********************************/
 
 
@@ -83,13 +105,25 @@ db.Address.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
 db.User.hasOne(db.Address, { foreignKey: 'user_id', sourceKey: 'id' });
 db.UserAuth.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
 db.User.hasOne(db.UserAuth, { foreignKey: 'user_id', sourceKey: 'id' });
+
+// Announcement
+db.Announcement.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
+db.User.hasMany(db.Announcement, { foreignKey: 'user_id', sourceKey: 'id' });
+
+// Material
+db.Material.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
+db.User.hasMany(db.Material, { foreignKey: 'user_id', sourceKey: 'id' });
+
+// Document
+db.Document.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
+db.User.hasMany(db.Document, { foreignKey: 'user_id', sourceKey: 'id' });
 /**************************** Relation About User (End) ****************************/
 
 
 /************************ Relation About BillProject (Start) ************************/
 // BillProject
 db.BillProject.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
-db.User.hasMany(db.BillProject, {foreignKey: 'user_id', sourceKey: 'id' });
+db.User.hasMany(db.BillProject, { foreignKey: 'user_id', sourceKey: 'id' });
 
 // Load
 db.Load.belongsTo(db.BillProject, { foreignKey: 'billProject_id', targetKey: 'id' });
@@ -242,7 +276,7 @@ db.Hiring.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
 db.User.hasMany(db.Hiring, { foreignKey: 'user_id', sourceKey: 'id' });
 
 db.Seeking.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
-db.User.hasMany(db.User, { foreignKey: 'user_id', sourceKey: 'id' });
+db.User.hasMany(db.Seeking, { foreignKey: 'user_id', sourceKey: 'id' });
 
 db.Labor.belongsTo(db.Hiring, { foreignKey: 'hiring_id', targetKey: 'id' });
 db.Hiring.hasMany(db.Labor, { foreignKey: 'hiring_id', sourceKey: 'id' });
@@ -250,6 +284,39 @@ db.Hiring.hasMany(db.Labor, { foreignKey: 'hiring_id', sourceKey: 'id' });
 db.Labor.belongsTo(db.Seeking, { foreignKey: 'seeking_id', targetKey: 'id' });
 db.Seeking.hasMany(db.Labor, { foreignKey: 'seeking_id', sourceKey: 'id' });
 /************************* Relation About JobSearch (End) *************************/
+
+
+/************************** Relation About Product (Start) **************************/
+db.Product.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
+db.User.hasMany(db.Product, { foreignKey: 'user_id', sourceKey: 'id' });
+
+db.ProductThumb.belongsTo(db.Product, { foreignKey: 'product_id', targetKey: 'id' });
+db.Product.hasMany(db.ProductThumb, { foreignKey: 'product_id', sourceKey: 'id' });
+
+db.ProductOpt.belongsTo(db.Product, { foreignKey: 'product_id', targetKey: 'id' });
+db.Product.hasMany(db.ProductOpt, { foreignKey: 'product_id', sourceKey: 'id' });
+
+db.BucketProduct.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
+db.User.hasMany(db.BucketProduct, { foreignKey: 'user_id', sourceKey: 'id' });
+
+db.BucketProductOpt.belongsTo(db.BucketProduct, { foreignKey: 'bucketProduct_id', targetKey: 'id' });
+db.BucketProduct.hasMany(db.BucketProductOpt, { foreignKey: 'bucketProduct_id', sourceKey: 'id' });
+
+db.EstimateOfBucket.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
+db.User.hasMany(db.EstimateOfBucket, { foreignKey: 'user_id', sourceKey: 'id' });
+/*************************** Relation About Product (End) ***************************/
+
+
+/************************* Relation About MarketPrice (Start) *************************/
+db.MarketPrice.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
+db.User.hasMany(db.MarketPrice, { foreignKey: 'user_id', sourceKey: 'id' });
+
+db.MarketPriceOpt.belongsTo(db.MarketPrice, { foreignKey: 'marketPrice_id', targetKey: 'id' });
+db.MarketPrice.hasMany(db.MarketPriceOpt, { foreignKey: 'marketPrice_id', sourceKey: 'id' });
+
+db.Address.belongsTo(db.MarketPrice, { foreignKey: 'marketPrice_id', targetKey: 'id' });
+db.MarketPrice.hasOne(db.Address, { foreignKey: ' marketPrice_id', sourceKey: 'id' });
+/************************** Relation About MarketPrice (End) **************************/
 
 
 module.exports = db;

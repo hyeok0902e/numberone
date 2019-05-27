@@ -1,10 +1,10 @@
 module.exports = (sequelize, DataTypes) => (
-    sequelize.define('Labor', {
-        major: { // 업무
+    sequelize.define('MarketPriceOpt', {
+        name: {
             type: DataTypes.STRING(255),
             allowNull: false,
         },
-        people: { // 인원수 
+        price: {
             type: DataTypes.INTEGER(11),
             allowNull: false,
         },

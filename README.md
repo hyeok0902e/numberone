@@ -33,17 +33,39 @@
     - routes/billProject
     - models/jobSearch
 
+### 2019.05.27(월)
+
+#### 모델설계
+    - models/marketPrice
+    - models/document
+    - models/product
+    - models/organization
+    - models/Announcement.js
+    - models/index.js
+
+#### 라우터
+    - billProject/
+
+#### API
+    - 주소 API 사용법 정리 => Notion (전기인 넘버원 - Open API)
+
 ## ToDo
 - image upload to s3
 - 만들어 놓은 exUser 미들웨어로 코드 교체
+- API Version Routing (ex => /V1/bill/create)
 
 ## 모델생성 및 관계세팅 진행률
     - company & paper - 100%
-    - billProject - 90%
+    - billProject - 90% => 점검 1회 필요
     - feeProject - 100%
     - statement - 100%
     - jobSearch - 90% => 관계부분 좀 더 고민해 볼 것 (등록글 - 신청글)
-    - Product
+    - Announcement - 100%
+    - Material - 100%
+    - Organization - 100%
+    - Product - 90% => 장바구니, 견적 부분에서 좀 더 효율적인 관계 고민 - 1번만 해보기 
+    - document - 100%
+    - marketPrice - 100%
 
 ## 오류/문제 해결 내용
 
