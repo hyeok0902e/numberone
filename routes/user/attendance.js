@@ -1,6 +1,11 @@
 const express = require('express');
 const moment = require('moment');
+
+// 모델 import
 const { User, Attendance, Sequelize } = require('../../models');
+
+// 커스텀 미들웨어
+const { exUser } = require('../middlewares/main');
 const { response } = require('../middlewares/response');
 
 // for findAll using range

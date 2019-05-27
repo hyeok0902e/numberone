@@ -1,8 +1,13 @@
 const express = require('express');
 const bcrypt = require('bcrypt'); // 비밀번호 암호화 모듈
 const moment = require('moment'); // Data formating 모듈
+
+// 모델 import
 const { Sequelize, User, UserPick, Attendance, Load } = require('../models/'); // address 추가 필요
+
+// 커스텀 미들웨어
 const { response } = require('./middlewares/response');
+
 const router = express.Router();
 
 // for findAll using range
@@ -10,9 +15,9 @@ const Op = Sequelize.Op;
 
 // Main(Home)
 router.get('/', async (req, res, next) => {
-    const { user_id } = req.query;
-
     try {
+        const { user_id } = req.query;
+
         // 금일 날짜
         const today = moment(Date.now()).format('YYYY-MM-DD');
 

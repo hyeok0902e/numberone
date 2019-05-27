@@ -1,14 +1,65 @@
 const express = require('express');
 const bcrypt = require('bcrypt'); // 비밀번호 암호화 모듈
-
+const jwt = require('jsonwebtoken');
+const uuidv4 = require('uuid/v4');
 // 모델 import
 const { User, UserPick, Attendance } = require('../../models'); // address 추가 필요
 
 // 커스텀 미들웨어
+const { exUser } = require('../middlewares/main');
 const { response } = require('../middlewares/response');
-const { exUser } = require('../middlewares/exUser'); // user 존재여부 확인
 
 const router = express.Router();
+
+// 토큰 재발급 
+router.post('/token', async (req, res, next) => {
+    try {   
+        const { user_id, uuid } = req.body;
+
+        // 데이터 유효성 체크
+        if (!user_id) { response(res, 400, "로그인 필요"); return; }
+        if (!uuid) { response(res, 400, "사용자의 세션정보 없음"); return; }
+
+        // 유저 확인
+        if (await exUser(user_id)) {
+            const user = await User.findOne({ where: { id: user_id } });
+
+            // uuid 정보가 일치하면, 토큰 업데이트
+            if (user.uuid == uuid) {
+                const uuidNew = await uuidv4();
+
+                // 사용자 uuid 값 업데이트
+                await User.update({ uuid: uuidNew }, { where: { id: user_id } })
+
+                // 새 토큰 발행
+                const token = await jwt.sign({
+                    user_id: user.id, 
+                    email: user.email,
+                }, process.env.JWT_SECRET,{
+                    expiresIn: '15m',
+                    issuer: 'tlcompany',
+                });
+
+                let payLoad = {
+                    user_id,
+                    uuid: uuidNew,
+                    token,
+                }
+
+                response(res, 200, "토큰 및 uuid 업데이트", payLoad);
+            } else {
+                response(res, 401, "권한 없음");
+            }
+            
+        } else {
+            response(res, 404, "사용자 없음");
+        }
+    } catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러");
+    }
+    
+});
 
 // 회원가입
 router.post('/signUp', async (req, res, next) => {
@@ -87,10 +138,10 @@ router.post('/signUp', async (req, res, next) => {
 });
 
 // 이메일 중복체크
-router.get('/doublCheckEmail', async (req, res, next) => {
-    const { email } = req.query;
-    
+router.get('/doublCheckEmail', async (req, res, next) => {  
     try {
+        const { email } = req.query;
+
         const user = await User.findOne({ where: { email: email }});
         console.log(user);
         if (user) {
@@ -121,6 +172,20 @@ router.post('/signIn', async (req, res, next) => {
             // 비번 일치 여부 체크
             const result = await bcrypt.compare(password, user.password);
             if (result) {
+
+                // 보안 이슈를 위한 jwt 토큰 생성
+                // const token = await jwt.sign({
+                //     user_id: user.id, 
+                //     email: user.email,
+                // }, process.env.JWT_SECRET,{
+                //     expiresIn: '15m',
+                //     issuer: 'tlcompany',
+                // });
+                
+                // uuid 업데이트
+                const uuidNew = await uuidv4();
+                await User.update({ uuid: uuidNew }, { where: { id: user.id } });
+
                 let payLoad = {
                     id: user.id,
                     name: user.name,
@@ -129,6 +194,7 @@ router.post('/signIn', async (req, res, next) => {
                     birth: user.birth,
                     gender: user.gender,
                     level: user.level,
+                    // token, 
                 };
                 response(res, 200, "로그인 성공", payLoad);
             } else {

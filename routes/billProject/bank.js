@@ -5,8 +5,8 @@ const moment = require('moment');
 const { User, UserAuth, BillProject, Load } = require('../../models');
 
 // 커스텀 미들웨어
-const { response } = require('../middlewares/response'); // response to front
-const { exUser } = require('../middlewares/exUser'); // user 존재여부 확인
+const { exUser } = require('../middlewares/main'); 
+const { response } = require('../middlewares/response');
 const { checkBillAuth } = require('../middlewares/userAuth');
 
 const router = express.Router();

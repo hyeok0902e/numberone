@@ -76,6 +76,10 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.INTEGER(5),
             allowNull: true,
         },
+        uuid: {
+            type: DataTypes.STRING(512),
+            allowNull: true,
+        },
     }, {
         timestamps: false,
         paranoid: true,

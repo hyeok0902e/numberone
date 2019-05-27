@@ -4,8 +4,8 @@ const express = require('express');
 const { User, UserAuth, BillProject } = require('../../models');
 
 // 커스텀 미들웨어
-const { response } = require('../middlewares/response'); // 미들웨어: response to front
-const { exUser } = require('../middlewares/exUser'); // 미들웨어: user 존재여부 확인
+const { exUser } = require('../middlewares/main'); 
+const { response } = require('../middlewares/response');
 const { checkBillAuth } = require('../middlewares/userAuth');
 
 const router = express.Router();
