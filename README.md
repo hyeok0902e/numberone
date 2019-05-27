@@ -44,7 +44,7 @@
 - models/index.js
 
 #### 라우터 및 미들웨어 설계
-- routes/billProject/bank
+- routes/billProject/bank - create, put
 - routes/middlewares - exUser, userAuth
 
 #### API

@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt'); // 비밀번호 암호화 모듈
 const jwt = require('jsonwebtoken');
 const uuidv4 = require('uuid/v4');
 // 모델 import
-const { User, UserPick, Attendance } = require('../../models'); // address 추가 필요
+const { User, UserPick, UserAuth } = require('../../models'); // address 추가 필요
 
 // 커스텀 미들웨어
 const { exUser } = require('../middlewares/main');
@@ -111,7 +111,11 @@ router.post('/signUp', async (req, res, next) => {
                 let userPick = await UserPick.create({ name: up });
                 await user.addUserPick(userPick);
             });
-            
+
+            // 권한 생성
+            const userAuth = await UserAuth.create({ period: 30 });
+            await user.setUserAuth(userAuth); // hasOne
+
             // 주소 생성 코드 작성 필요!
             // const address = await Address.create({ });
             // await user.address(address)

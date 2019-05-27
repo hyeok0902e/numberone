@@ -36,7 +36,7 @@ router.get('/', async (req, res, next) => {
     }   
 });
 
-router.post('/create', async (req, res, next) => {
+router.post('/', async (req, res, next) => {
     try {
         const { name, voltType, user_id } = req.body;
 

@@ -28,7 +28,8 @@ router.post('/', async (req, res, next) => {
 
             if ((await checkBillAuth(user))) {
                 const bank = await Load.create({ type: 0, name });
-                await user.addLoad(bank);
+                const billProject = await BillProject.findOne({ where: { id: billProject_id } });
+                await billProject.addLoad(bank);
                 
                 let payLoad = { name: bank.name };
                 response(res, 201, "뱅크 생성", payLoad);
@@ -36,7 +37,6 @@ router.post('/', async (req, res, next) => {
                 response(res, 401, "권한 없음");
                 return;
             }
-
         } else {
             response(res, 404, "유저가 존재하지 않습니다.");
         }
@@ -46,7 +46,34 @@ router.post('/', async (req, res, next) => {
     }
 });
 
-router.get('/test', (req, res, next) => {
-    console.log(Date.now());
-})
+router.put('/', async (req, res, next) => {
+    try {
+        const { user_id, load_id, name } = req.body;
+        
+        // 데이터 유효성 체크
+        if (!user_id) { response(res, 400, "로그인 필요"); return; }
+        if (!load_id) { response(res, 400, "뱅크 정보 없음"); return; }
+        if (!name) { response(res, 400, "입력값 없음"); return; }
+
+        if (await exUser(user_id)) {
+            await Load.update({ name: name }, { where: { id: load_id } });
+            const bank = await Load.findOne({ where: { id: load_id }});
+            
+            if (!bank) {
+                response(res, 404, "뱅크 없음");
+                return;
+            }
+            
+            let payLoad = { name: bank.name }
+            response(res, 200, "수정완료", payLoad);
+        } else {
+            response(res, 404, "유저가 존재하지 않습니다.");
+        }
+
+    } catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러");
+    }
+});
+
 module.exports = router;
