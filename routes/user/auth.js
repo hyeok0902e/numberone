@@ -6,7 +6,7 @@ const uuidv4 = require('uuid/v4');
 const { User, UserPick, UserAuth } = require('../../models'); // address 추가 필요
 
 // 커스텀 미들웨어
-const { exUser } = require('../middlewares/main');
+const { exUser, verifyToken } = require('../middlewares/main');
 const { response } = require('../middlewares/response');
 
 const router = express.Router();
@@ -20,40 +20,37 @@ router.post('/token', async (req, res, next) => {
         if (!user_id) { response(res, 400, "로그인 필요"); return; }
         if (!uuid) { response(res, 400, "사용자의 세션정보 없음"); return; }
 
-        // 유저 확인
-        if (await exUser(user_id)) {
-            const user = await User.findOne({ where: { id: user_id } });
-
-            // uuid 정보가 일치하면, 토큰 업데이트
-            if (user.uuid == uuid) {
-                const uuidNew = await uuidv4();
-
-                // 사용자 uuid 값 업데이트
-                await User.update({ uuid: uuidNew }, { where: { id: user_id } })
-
-                // 새 토큰 발행
-                const token = await jwt.sign({
-                    user_id: user.id, 
-                    email: user.email,
-                }, process.env.JWT_SECRET,{
-                    expiresIn: '15m',
-                    issuer: 'tlcompany',
-                });
-
-                let payLoad = {
-                    user_id,
-                    uuid: uuidNew,
-                    token,
-                }
-
-                response(res, 200, "토큰 및 uuid 업데이트", payLoad);
-            } else {
-                response(res, 401, "권한 없음");
-            }
-            
-        } else {
+        // 유저 존재여부 체크
+        if (!(await exUser(user_id))) {
             response(res, 404, "사용자 없음");
+            return;
         }
+
+        const user = await User.findOne({ where: { id: user_id } });
+
+        // uuid 정보가 일치하면, 토큰 업데이트
+        if (user.uuid == uuid) {
+            // uuid 갱신
+            const uuidNew = await uuidv4();
+
+            // 사용자 uuid 값 업데이트
+            await User.update({ uuid: uuidNew }, { where: { id: user_id } })
+
+            // 토큰 갱신
+            const token = await jwt.sign({
+                user_id: user.id, 
+                email: user.email,
+            }, process.env.JWT_SECRET,{
+                expiresIn: '15m',
+                issuer: 'tlcompany',
+            });
+
+            let payLoad = { user_id, uuid: uuidNew, token }
+            response(res, 200, "토큰 및 uuid 갱신 성공", payLoad);
+        } else {
+            response(res, 401, "권한 없음");
+        }
+   
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");
@@ -64,12 +61,17 @@ router.post('/token', async (req, res, next) => {
 // 회원가입
 router.post('/signUp', async (req, res, next) => {
     const { 
+        /* 사용자 정보 */
         email, password, password2, // 이메일, 비밀번호
         fbUID, fbFCM, // Firebase UID & FCM Token
         name, birth, gender, phone, task, // 이름, 생일, 성, 휴대폰, 직종
         company, companyTel, fax, profile, // 회사명, 회사번호, 팩스, 프로필사진
         level, productAuth, marketAuth, // 회원등급, 제품등록 권한, 시세정보등록 권한 
         userPicks, 
+
+        /* 사용자 주소 정보 */
+        jibunAddr, roadFullAddr, roadAddrPart1, roadAddrPart2,
+        engAddr, zipNo, siNm, sggNm, emdNm, liNm, rn, lnbrMnnm, lnbrSlno, detail,
     } = req.body;
 
     try {
@@ -89,9 +91,9 @@ router.post('/signUp', async (req, res, next) => {
             } 
 
             // 주소를 입력하지 않았을 때 response 작성 필요!
-            // if (!address) {
-            //     response(res, 400, "주소를 입력해 주세요.");
-            //     return;
+            // if (!jibunAddr || !roadFullAddr) {
+            //     response(res, 400, "주소를 입력해주세요.");
+            //     return
             // }
 
             // 비밀번호 암호화
@@ -113,12 +115,16 @@ router.post('/signUp', async (req, res, next) => {
             });
 
             // 권한 생성
-            const userAuth = await UserAuth.create({ period: 30 });
+            const userAuth = await UserAuth.create({ period: 0 });
             await user.setUserAuth(userAuth); // hasOne
 
             // 주소 생성 코드 작성 필요!
-            // const address = await Address.create({ });
-            // await user.address(address)
+            // const address = await Address.create({ 
+            //     jibunAddr, roadFullAddr, roadAddrPart1, roadAddrPart2,
+            //     engAddr, zipNo, siNm, sggNm, emdNm, liNm, rn,
+            //     lnbrMnnm, lnbrSlno, detail
+            // });
+            // await user.setAddress(address)
 
             // 응답
             let payLoad = {
@@ -129,15 +135,15 @@ router.post('/signUp', async (req, res, next) => {
                 birth: user.birth,
                 gender: user.gender,
                 level: user.level,
-                // address: address.roadFullAddr
+                // address: roadFullAddr,
             };
             response(res, 201, "회원가입 성공", payLoad);
         } else {
-            response(res, 400, "정보를 제대로 입력해주세요.")
+            response(res, 400, "allowNull 에러")
         }
     } catch (err) {
-        console.log(err)
-        response(res, 500, "서버 에러")
+        console.log(err);
+        response(res, 500, "서버 에러");
     }
 });
 

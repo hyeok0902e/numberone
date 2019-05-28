@@ -27,11 +27,13 @@ const attendanceRouter = require('./routes/user/attendance.js');
 const authRouter = require('./routes/user/auth.js');
 
 // billProject
-const billIndexRouter = require('./routes/billProject/index.js');
-const billMotorLoadRouter = require('./routes/billProject/motorload.js');
+const billRouter = require('./routes/billProject/index.js');
 
 // Load
 const bankRouter = require('./routes/billProject/bank.js');
+const groupRouter = require('./routes/billProject/group.js');
+const motorLoadRouter = require('./routes/billProject/motorLoad.js');
+const normalLoadRouter = require('./routes/billProject/normalLoad.js');
 /*********************** Router (End) ***********************/
 
 const app = express();
@@ -74,11 +76,14 @@ app.use('/auth', authRouter);
 app.use('/attendance', attendanceRouter);
 
 // billProject
-app.use('/bill/', billIndexRouter);
-app.use('/bill/motorLoad', billMotorLoadRouter); // 수정필요
+app.use('/bill/', billRouter);
+app.use('/bill/motorLoad', motorLoadRouter); // 수정필요
 
 // Load
 app.use('/bill/bank', bankRouter);
+app.use('/bill/group', groupRouter)
+app.use('/bill/normalLoad', normalLoadRouter);
+app.use('/bill/motorLoad', motorLoadRouter);
 /*********************** Router URL (End) ***********************/
 
 app.use((req, res, next) => {

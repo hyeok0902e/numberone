@@ -34,7 +34,6 @@
 - models/jobSearch
 
 ### 2019.05.27(월)
-
 #### 모델 설계
 - models/marketPrice
 - models/document
@@ -42,11 +41,9 @@
 - models/organization
 - models/Announcement.js
 - models/index.js
-
 #### 라우터 및 미들웨어 설계
 - routes/billProject/bank - create, put
 - routes/middlewares - exUser, userAuth
-
 #### API
 - 주소 API 사용법 정리 => Notion (전기인 넘버원 - Open API)
 - jwt 토큰을 이용한 보안 기능 추가(강화)
@@ -54,9 +51,18 @@
     - Front 단에서도 uuid와 token 정보를 업데이트 해주어야 함 (세션을 통해)
 
 ### 2019.05.28(화)
+#### 라우터 설계
+- 필수 체크 요소 개발: 권한(유료 회원, 데이터 소유자), 전달값 존재여부, 입력값 존재여부, 유저 존재여뷰 등
+- routes/user/auth - 회원가입부분 주소 입력 추가
+    - 현재 주석처리 함 => Front와 테스팅 필요
+- routes/billProject/bank - put 
+- routes/billProject/group - create
+#### 보안/인증
+- 사용자 유효성 검사 기능 90% 이상 개발 완료: 노션에 정리되어 있음
+    - Front와 테스팅만 진행하면 될듯..
 
-        
 ## ToDo
+- 회원가입 라우터 => 이미 가입한 사용자인지 체크하는 기능 추가
 - image upload to s3
 - 만들어 놓은 exUser 미들웨어로 코드 교체
 - API Version Routing (ex => /V1/bill/create)

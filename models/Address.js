@@ -24,31 +24,31 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.STRING(45),
             allowNull: true,
         },
-        siName: {
+        siNm: {
             type: DataTypes.STRING(45),
             allowNull: true,
         },
-        sggName: {
+        sggNm: {
             type: DataTypes.STRING(45),
             allowNull: true,
         },
-        emdName: {
+        emdNm: {
             type: DataTypes.STRING(45),
             allowNull: true,
         },
-        liName: {
+        liNm: {
             type: DataTypes.STRING(45),
             allowNull: true,
         },
-        roadName: {
+        rn: {
             type: DataTypes.STRING(45),
             allowNull: true,
         },
-        bunji: {
+        lnbrMnnm: {
             type: DataTypes.STRING(45),
             allowNull: true,
         },
-        ho: {
+        lnbrSlno: {
             type: DataTypes.STRING(45),
             allowNull: true,
         },
