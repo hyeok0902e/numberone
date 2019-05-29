@@ -101,7 +101,7 @@ router.put('/:bank_id/edit', async (req, res, next) => {
             await Load.update({ name: name }, { where: { id: bank.id } });
             
             let payLoad = { bankName: name, bank_id: bank_id }
-            response(res, 200, "수정완료", payLoad);
+            response(res, 200, "수정 완료", payLoad);
         } else {
             response(res, 401, "권한 없음");
         }
@@ -148,7 +148,7 @@ router.delete('/:bank_id/delete', async (req, res, next) => {
         // 접근 권한 체크 
         if (billProject.user_id == user.id) {
             await bank.destroy();
-            response(res, 200, "수정완료", payLoad);
+            response(res, 200, "삭제 완료", payLoad);
         } else {
             response(res, 401, "권한 없음");
         }

@@ -83,13 +83,13 @@ router.put('/:group_id/edit', async (req, res, next) => {
             where: { id: user_id }, 
             include: [{ model: UserAuth }], 
         });
-        
+
         // 계산서 권한 체크
         if (!(await billAuth(user))) {  
             response(res, 401, "권한 없음");
             return;
         }
-
+        
         // 그룹 존재여부 체크
         const group = await Load.findOne({ where: { id: group_id, type: 1 } });
         if (!group) { response(res, 404, "그룹 없음"); return; } 
