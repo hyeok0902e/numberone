@@ -6,7 +6,7 @@ const { User, UserAuth, BillProject } = require('../../models');
 // 커스텀 미들웨어
 const { exUser, verifyToken } = require('../middlewares/main'); 
 const { response } = require('../middlewares/response');
-const { checkBillAuth } = require('../middlewares/userAuth');
+const { billAuth } = require('../middlewares/userAuth');
 
 const router = express.Router();
 
@@ -54,7 +54,7 @@ router.post('/create', async (req, res, next) => {
         });
 
         // 계산서 권한 체크
-        if (!(await checkBillAuth(user))) {
+        if (!(await billAuth(user))) {
             response(res, 400, "권한 없음");
             return;
         }
@@ -92,7 +92,16 @@ router.get('/:billProject_id/edit', async (req, res, next) => {
             return;
         }
 
-        const user = await User.findOne({ where: { id: user_id } });
+        const user = await User.findOne({ 
+            where: { id: user_id }, 
+            include: [{ model: UserAuth }], 
+        });
+
+        // 계산서 권한 체크
+        if (!(await billAuth(user))) {
+            response(res, 400, "권한 없음");
+            return;
+        }
 
         // 계산서 존재여부 체크
         const billProject = await BillProject.findOne({ where: { id: billProject_id, user_id: user.id } });

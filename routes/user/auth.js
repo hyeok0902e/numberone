@@ -184,13 +184,13 @@ router.post('/signIn', async (req, res, next) => {
             if (result) {
 
                 // 보안 이슈를 위한 jwt 토큰 생성
-                // const token = await jwt.sign({
-                //     user_id: user.id, 
-                //     email: user.email,
-                // }, process.env.JWT_SECRET,{
-                //     expiresIn: '15m',
-                //     issuer: 'tlcompany',
-                // });
+                const token = await jwt.sign({
+                    user_id: user.id, 
+                    email: user.email,
+                }, process.env.JWT_SECRET,{
+                    expiresIn: '15m',
+                    issuer: 'tlcompany',
+                });
                 
                 // uuid 업데이트
                 const uuidNew = await uuidv4();
@@ -204,6 +204,7 @@ router.post('/signIn', async (req, res, next) => {
                     birth: user.birth,
                     gender: user.gender,
                     level: user.level,
+                    // user.uuid
                     // token, 
                 };
                 response(res, 200, "로그인 성공", payLoad);

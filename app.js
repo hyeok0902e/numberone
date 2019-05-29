@@ -10,14 +10,19 @@ require('dotenv').config();
 
 // Cross Origin Resource Sharing
 const cors = require('cors');
-
 const corsOptions = {
     origin: true,
     credentials: true
 };
 
+// node-schedule
+const schedule = require('node-schedule'); 
+const rule = new schedule.RecurrenceRule(); 
+rule.second = 3; //매 시간 30분 마다 수행 
+
 const { sequelize } = require('./models');
 // const passportConfig = require('./passport') ;
+
 
 /********************** Router (Start) **********************/
 const indexRouter = require('./routes');
@@ -36,6 +41,7 @@ const motorLoadRouter = require('./routes/billProject/motorLoad.js');
 const normalLoadRouter = require('./routes/billProject/normalLoad.js');
 /*********************** Router (End) ***********************/
 
+
 const app = express();
 
 // Cross Origin Resource Sharing
@@ -43,7 +49,24 @@ app.use(cors(corsOptions));
 
 sequelize.sync();
 // passportConfig(passport);
+
 moment.tz.setDefault("Asia/Seoul"); // 시간대 설정
+
+
+/********************* Udate UserAuht - Period (Start) *********************/
+const { UserAuth } = require('./models');
+schedule.scheduleJob('0 0 0 */1 * *', async () => {       
+    const userAuths = await UserAuth.findAll();
+    await userAuths.forEach(async (ua) => {
+        if (ua.period > 0) {
+            var period = ua.period - 1
+            await ua.update({ period });
+        } 
+    }); 
+    console.log('a')
+});
+/********************** Udate UserAuht - Period (End) **********************/
+
 
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'ejs');
@@ -85,6 +108,7 @@ app.use('/bill/group', groupRouter)
 app.use('/bill/normalLoad', normalLoadRouter);
 app.use('/bill/motorLoad', motorLoadRouter);
 /*********************** Router URL (End) ***********************/
+
 
 app.use((req, res, next) => {
     const err = new Error('Not Found');

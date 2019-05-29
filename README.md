@@ -60,6 +60,17 @@
 #### 보안/인증
 - 사용자 유효성 검사 기능 90% 이상 개발 완료: 노션에 정리되어 있음
     - Front와 테스팅만 진행하면 될듯..
+#### 유저 권한 업데이트
+- app.js => node-schedule 모듈 사용: 하루에 한 번 씩 userAuth.period가 0보다 크면 "-1"이 된다.
+    - 개발 완료
+#### 미들웨어
+- 기능별 유저 권한 체크 => routes/middlewares/userAuth.js
+
+### 2019.05.29(수)
+#### 라우터 구현
+- /billProject/group.js => edit
+- delete => bank & group
+
 
 ## ToDo
 - 회원가입 라우터 => 이미 가입한 사용자인지 체크하는 기능 추가
@@ -85,4 +96,7 @@
 ## 오류/문제 해결 내용
 
 ## 새로 배운 내용
+### Sequelize Syntax
+#### belongsTo & hasOne 관계일 때 관계 추가하기
+- parentModel.setModelName(childModel) => addModelName(hadMany일 때 사용)이 아님
 
