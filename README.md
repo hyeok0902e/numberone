@@ -70,7 +70,8 @@
 #### 라우터 구현
 - /billProject/group.js => edit
 - delete => bank & group
-
+- s3 이미지 업로드 구현 => middlewares/uploadImg
+- /user/auth.js => profileUpload
 
 ## ToDo
 - 회원가입 라우터 => 이미 가입한 사용자인지 체크하는 기능 추가

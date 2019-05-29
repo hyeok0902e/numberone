@@ -6,7 +6,16 @@ const morgan = require('morgan');
 const session = require('express-session');
 const flash = require('connect-flash');
 const moment = require("moment");
+const AWS = require('aws-sdk');
+
 require('dotenv').config();
+
+// aws config
+AWS.config.update({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region : 'ap-northeast-2'
+});
 
 // Cross Origin Resource Sharing
 const cors = require('cors');

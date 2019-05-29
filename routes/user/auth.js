@@ -2,14 +2,31 @@ const express = require('express');
 const bcrypt = require('bcrypt'); // 비밀번호 암호화 모듈
 const jwt = require('jsonwebtoken');
 const uuidv4 = require('uuid/v4');
+
 // 모델 import
 const { User, UserPick, UserAuth } = require('../../models'); // address 추가 필요
 
 // 커스텀 미들웨어
 const { exUser, verifyToken } = require('../middlewares/main');
 const { response } = require('../middlewares/response');
+const { uploadImg } = require('../middlewares/uploadImg');
 
 const router = express.Router();
+
+
+// 프로필 사진 업로드 - S3
+router.post('/profileUpload', uploadImg.single('profile'), (req, res) => {
+    try {
+        console.log("req.file: ", req.file);
+
+        let payLoad = { profileUrl: req.file.location };
+        response(res, 201, "프로필 등록 성공", payLoad);
+    } catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러")
+    }
+});
+
 
 // 토큰 재발급 
 router.post('/token', async (req, res, next) => {
