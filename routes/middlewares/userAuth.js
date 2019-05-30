@@ -1,6 +1,6 @@
 // 업체관리 등록 권한
 exports.compAuth = async (user) => {
-    if ((user.UserAuth.period > 0) && (user.UserAuth.compManage > 0)) {
+    if ((user.UserAuth.compManage > 0)) {
         return true;
     } else {
         return false;
@@ -9,7 +9,7 @@ exports.compAuth = async (user) => {
 
 // 계산서 프로젝트 등록 권한
 exports.billAuth = async (user) => {
-    if ((user.UserAuth.period > 0) && (user.UserAuth.billProject > 0)) {
+    if ((user.UserAuth.billProject > 0)) {
         return true;
     } else {
         return false;
@@ -36,7 +36,7 @@ exports.organizationAuth = async (user) => {
 
 // 수수료 프로젝트 등록 권한
 exports.feeAuth = async (user) => {
-    if ((user.UserAuth.period > 0) && (user.UserAuth.feeProject > 0)) {
+    if ((user.UserAuth.feeProject > 0)) {
         return true;
     } else {
         return false;
@@ -45,7 +45,7 @@ exports.feeAuth = async (user) => {
 
 // 내역서 등록 권한
 exports.checkStatementAuth = async (user) => {
-    if ((user.UserAuth.period > 0) && (user.UserAuth.statement > 0)) {
+    if ((user.UserAuth.statement > 0)) {
         return true;
     } else {
         return false;

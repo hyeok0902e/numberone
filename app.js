@@ -49,6 +49,9 @@ const groupRouter = require('./routes/billProject/group.js');
 const motorLoadRouter = require('./routes/billProject/motorLoad.js');
 const normalLoadRouter = require('./routes/billProject/normalLoad.js');
 
+//company 
+const compRouter = require('./routes/company/company.js');
+
 // product
 const productRouter = require("./routes/product/product.js");
 /*********************** Router (End) ***********************/
@@ -120,6 +123,9 @@ app.use('/bill/bank', bankRouter);
 app.use('/bill/group', groupRouter)
 app.use('/bill/normalLoad', normalLoadRouter);
 app.use('/bill/motorLoad', motorLoadRouter);
+
+// company
+app.use('/company', compRouter);
 
 // Product
 app.use('/product', productRouter);

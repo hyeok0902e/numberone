@@ -1,6 +1,5 @@
 exports.response = async (res, resultCode, message, payLoad) => {  
     try {
-        console.log("후화")
         return await res.status(resultCode).json({
             resultCode: resultCode,
             message: message,

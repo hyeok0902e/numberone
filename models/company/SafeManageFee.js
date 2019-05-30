@@ -11,14 +11,17 @@ module.exports = (sequelize, DataTypes) => (
         passiveKw: { // 수전 용량
             type: DataTypes.INTEGER(11),
             allowNull: true,
+            defaultValue: 0,
         },
         generateKw: { // 발전 용량
             type: DataTypes.INTEGER(11),
             allowNull: true,
+            defaultValue: 0,
         },
         sunKw: { // 신재생(태양광) 용량
             type: DataTypes.INTEGER(11),
             allowNull: true,
+            defaultValue: 0,
         },
         sum: { // 합계
             type: DataTypes.INTEGER(11),

@@ -77,9 +77,10 @@
 ### 2019.05.30(목)
 #### 라우터 설계
 - /product/product.js => create => forEach 샹노무자식
+- /company/company.js => get, create, get(edit), put(edit)
 
 #### 해결해야 할 오류
-- routes/product/product.js => create에서 product의 productOpt와 productThumb값을 받아오지 못함.
+- [해결완료] routes/product/product.js => create에서 product의 productOpt와 productThumb값을 받아오지 못함.
 
 ## ToDo
 - 회원가입 라우터 => 이미 가입한 사용자인지 체크하는 기능 추가

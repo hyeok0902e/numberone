@@ -97,9 +97,13 @@ router.post('/signUp', async (req, res, next) => {
             && level && productAuth && marketAuth) { // 반드시 입력받아야 하는 값들
             
             if (password != password2) {
-                response(res, 400, "비밀번호가 일치하지 않습니다.");
+                response(res, 400, "비밀번호가 불일치");
                 return;
             }
+
+            // 이메일 중복체크
+            const exUser = await User.findAll({ where: { email: email } });
+            if (exUser) { response(res, "400", "이메일 중복"); return; }
 
             // 관심목록 입력 여부 체크
             if ((!userPicks) || (userPicks == [])) {
@@ -109,7 +113,7 @@ router.post('/signUp', async (req, res, next) => {
 
             // 주소를 입력하지 않았을 때 response 작성 필요!
             // if (!jibunAddr || !roadFullAddr) {
-            //     response(res, 400, "주소를 입력해주세요.");
+            //     response(res, 400, "주소 없음");
             //     return
             // }
 
@@ -156,7 +160,7 @@ router.post('/signUp', async (req, res, next) => {
             };
             response(res, 201, "회원가입 성공", payLoad);
         } else {
-            response(res, 400, "allowNull 에러")
+            response(res, 400, "입력값 없음")
         }
     } catch (err) {
         console.log(err);

@@ -71,9 +71,14 @@ router.post('/imgUpload', uploadImg.single('image'), (req, res) => {
 router.post('/create', async (req, res, next) => {
     try {
         const { user_id, name, category, quantity, optNames, prices, urls } 
-        = req.body;
+            = req.body;
 
+        // 입력값 체크
         if (!user_id) { response(res, 400, "로그인 필요"); return; }
+        if (!name || !category || !optNames || !prices || !urls) { 
+            response(res, 400, "입력값 없음"); 
+            return; 
+        }
 
         // 유저 존재여부 체크
         if (!(await exUser(user_id))) { 
@@ -90,13 +95,16 @@ router.post('/create', async (req, res, next) => {
         let product = await Product.create({ name, category, quantity });
         await user.addProduct(product);
         
-        
         // ProductOpt 생성
         var num = 0
         if (optNames) {   
             for (i = 0; i < optNames.length; i++) {
                 const productOpt = await ProductOpt.create({ name: optNames[i], price: prices[i] })
-                    .then(async productOpt => { await product.addProductOpt(productOpt); });
+                    .then(async productOpt => { await product.addProductOpt(productOpt); })
+                    .catch(async err => { 
+                        console.log(err);
+                        response(res, 400, "에러: 제품 옵션 생성 실패");
+                    });
                     console.log("1")
             } 
             
@@ -106,7 +114,11 @@ router.post('/create', async (req, res, next) => {
         if (urls) {
             for (i = 0; i < urls.length; i++) {
                 const productThumb = await ProductThumb.create({ url: urls[i] })
-                    .then(async productThumb => { await product.addProductThumb(productThumb); });
+                    .then(async productThumb => { await product.addProductThumb(productThumb); })
+                    .catch(async err => { 
+                        console.log(err);
+                        response(res, 400, "에러: 제품 썸네일 생성 실패");
+                    });
                     console.log("2")
             } 
         }
@@ -120,7 +132,7 @@ router.post('/create', async (req, res, next) => {
             ] 
         });
         
-        let payLoad = { products: product };
+        let payLoad = { product: product };
         response(res, 201, "제품 등록됨", payLoad);
 
     } catch (err) {
