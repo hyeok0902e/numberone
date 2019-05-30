@@ -48,6 +48,9 @@ const bankRouter = require('./routes/billProject/bank.js');
 const groupRouter = require('./routes/billProject/group.js');
 const motorLoadRouter = require('./routes/billProject/motorLoad.js');
 const normalLoadRouter = require('./routes/billProject/normalLoad.js');
+
+// product
+const productRouter = require("./routes/product/product.js");
 /*********************** Router (End) ***********************/
 
 
@@ -100,6 +103,7 @@ app.use(flash());
 // app.use(passport.initialize());
 // app.use(passport.session());
 
+
 /********************** Router URL (Start) **********************/
 app.use('/', indexRouter);
 
@@ -116,6 +120,9 @@ app.use('/bill/bank', bankRouter);
 app.use('/bill/group', groupRouter)
 app.use('/bill/normalLoad', normalLoadRouter);
 app.use('/bill/motorLoad', motorLoadRouter);
+
+// Product
+app.use('/product', productRouter);
 /*********************** Router URL (End) ***********************/
 
 

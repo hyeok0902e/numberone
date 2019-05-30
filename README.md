@@ -72,6 +72,14 @@
 - delete => bank & group
 - s3 이미지 업로드 구현 => middlewares/uploadImg
 - /user/auth.js => profileUpload
+- /product/product.js => 구조 잡기
+
+### 2019.05.30(목)
+#### 라우터 설계
+- /product/product.js => create => forEach 샹노무자식
+
+#### 해결해야 할 오류
+- routes/product/product.js => create에서 product의 productOpt와 productThumb값을 받아오지 못함.
 
 ## ToDo
 - 회원가입 라우터 => 이미 가입한 사용자인지 체크하는 기능 추가
@@ -101,3 +109,7 @@
 #### belongsTo & hasOne 관계일 때 관계 추가하기
 - parentModel.setModelName(childModel) => addModelName(hadMany일 때 사용)이 아님
 
+### 반복문
+#### for문과 forEach
+- 동기 프로그래밍을 위해 async await 을 사용하는데, forEach에선 말을 잘 듣지 않는다.
+    - 결론: for(i=0; i < thins.lenght; i++) 을 사용하니 아주 깔끔

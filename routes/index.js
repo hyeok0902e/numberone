@@ -7,19 +7,37 @@ const { Sequelize, User, UserPick, Attendance, Load } = require('../models/'); /
 
 // 커스텀 미들웨어
 const { response } = require('./middlewares/response');
+const { exUser, verifyToken } = require('./middlewares/main');
 
 const router = express.Router();
 
 // for findAll using range
 const Op = Sequelize.Op;
 
-// Main(Home)
+// Main(Home) - 로그인 되어있을 시 금일 출석데이터 가져오기
 router.get('/', async (req, res, next) => {
     try {
         const { user_id } = req.query;
 
+        // user_id가 null일때 => 최초 접속
+        if (!user_id) { 
+            response(res, 200, "로그인 안됨"); 
+            return; 
+        }
+
+        // 유저 존재여부 체크
+        if (!(await exUser(user_id))) {
+            response(res, 404, "유저 없음");
+            return;
+        }
+
+        const user = await User.findOne({ 
+            where: { id: user_id }, 
+            attributes: ['id', 'email', 'name', 'gender', 'birth'] 
+        });
+
         // 금일 날짜
-        const today = moment(Date.now()).format('YYYY-MM-DD');
+        const today = await moment(Date.now()).format('YYYY-MM-DD');
 
         // 금일 출석 명단 
         const today_attendances = await Attendance.findAll({ 
@@ -28,26 +46,23 @@ router.get('/', async (req, res, next) => {
             order: [['date', 'DESC'],],
         });
 
-        if (user_id) {
-            const user = await User.findOne({ 
-                where: { id: user_id }, 
-                attributes: ['id', 'name', 'gender', 'birth'],
-            });
+        // 유저의 금일 출석여부 체크
+        const check = await Attendance.findOne({
+            where: {
+                user_id: user.id,
+                date: { [Op.gt]: moment(`${today}`)._d, },
+            },
+        })
 
-            // 일치하는 유저 정보가 없을 때
-            if (!user) {
-                let payLoad = { today_attendances };
-                response(res, 404, "일치하는 유저 정보 없음", payLoad);  
-                return;
-            } 
-
-            // 유저가 로그인 되었 있을 때
-            let payLoad = { today_attendances, user };
-            response(res, 200, "로그인 된 유저 있음", payLoad);
-            return;
+        // 유저가 로그인 되었 있을 때
+        if (check) {     
+            let payLoad = { today_attendances, user, todayAttd: 1 };
+            response(res, 200, "로그인 된 유저 있음, 출석 O", payLoad);
+        } else {
+            let payLoad = { today_attendances, user, todayAttd: 0 };
+            response(res, 200, "로그인 된 유저 있음, 출석 X", payLoad);
         }
-
-        response(res, 200, "최초 접속");
+        return;
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");

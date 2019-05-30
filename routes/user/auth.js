@@ -15,7 +15,7 @@ const router = express.Router();
 
 
 // 프로필 사진 업로드 - S3
-router.post('/profileUpload', uploadImg.single('profile'), (req, res) => {
+router.post('/imgUpload', uploadImg.single('image'), (req, res) => {
     try {
         console.log("req.file: ", req.file);
 
