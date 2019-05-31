@@ -35,3 +35,17 @@ exports.exUser = async (user_id) => {
     }  
 }
 
+// uuid 유효성 체크 => false 이면 중복 로그인!
+exports.verifyUid = async (tID, uID) => {
+    try {   
+        if (tID == uID) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러");
+    }
+} 
+

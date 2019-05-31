@@ -13,7 +13,7 @@ const router = express.Router();
 // 업체 목록 - 권한 체크 X
 router.get('/', async (req, res, next) => {
     try {
-        const { user_id } = req.body; 
+        const { user_id } = req.query; 
 
         // 로그인 여부 체크
         if (!user_id) { response(res, 400, "로그인 필요"); return; }
@@ -44,6 +44,43 @@ router.get('/', async (req, res, next) => {
         response(res, 200, "업체 목록", payLoad);
 
 
+    } catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러");
+    }
+});
+
+// 업체 상세보기
+router.get('/:company_id/show', async (req, res, next) => {
+    try {
+        const { user_id } = req.body; 
+        const { company_id } = req.params;
+
+        // 로그인 여부 체크
+        if (!user_id) { response(res, 400, "로그인 필요"); return; }
+        if (!company_id) { response(res, 400, "params값 없음"); return; }
+
+        // 유저 존재여부 체크
+        if (!(await exUser(user_id))) {
+            response(res, 404, "유저 없음");
+            return;
+        }
+
+        const user = await User.findOne({ 
+            where: { id: user_id }, 
+            include: [{ model: UserAuth }], 
+        });
+
+        const company = await Company.findOne({ where: { id: company_id } });
+        if (!company) { response(res, 404, "업체 없음"); return; }
+
+        if (company.user_id == user.id) {
+            const safeManageFee = await SafeManageFee.findOne({ where: { company_id } });
+            let payLoad = { company, safeManageFee };
+            response(res, 200, "업체 상세 정보", payLoad);
+        } else {
+            response(res, "401", "권한 없음");
+        }
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");
@@ -114,7 +151,9 @@ router.get('/:company_id/edit', async (req, res, next) => {
         const { user_id } = req.query;
         const { company_id } = req.params;
 
+        // 로그인 체크
         if (!user_id) { response(res, 400, '로그인 필요'); return; }
+        if (!company_id) { response(res, 400, "params값 없음"); return; }
 
         // 유저 존재여부 체크
         if (!(await exUser(user_id))) {
@@ -122,16 +161,7 @@ router.get('/:company_id/edit', async (req, res, next) => {
             return;
         }
 
-        const user = await User.findOne({ 
-            where: { id: user_id }, 
-            include: [{ model: UserAuth }], 
-        });
-
-        // 업체 등록 권한 체크
-        if (!(await compAuth(user))) {
-            response(res, 401, "권한 없음");
-            return;
-        }
+        const user = await User.findOne({ where: { id: user_id } });
 
         // 업체 존재여부 체크
         const company = await Company.findOne({ where: { id: company_id }});
@@ -154,16 +184,6 @@ router.get('/:company_id/edit', async (req, res, next) => {
 // 업체 편집 
 router.put('/:company_id/edit', async (req, res, next) => {
     try {
-
-    } catch (err) {
-        console.log(err);
-        response(res, 500, "서버 에러");
-    }
-});
-
-// 업체 삭제
-router.delete('/:company_id/edit', async (req, res, next) => {
-    try {
         const { user_id, name, key, mobile, tel, fax, email, memo,
             businessType, voltType, passiveKw, generateKw, sunKw, 
             sum, fee, weight, checking } = req.body; 
@@ -177,6 +197,55 @@ router.delete('/:company_id/edit', async (req, res, next) => {
             response(res, 400, "입력값 없음"); 
             return; 
         }
+        if (!company_id) { response(res, 400, "params값 없음"); return; }
+
+        // 유저 존재여부 체크
+        if (!(await exUser(user_id))) {
+            response(res, 404, "유저 없음");
+            return;
+        }
+
+        const user = await User.findOne({ where: { id: user_id } });
+
+        // 업체 존재여부 체크
+        let company = await Company.findOne({ where: { id: company_id }});
+        if (!company) { response(res, 404, "업체 없음"); return; }
+
+        // 권한 체크
+        if (company.user_id == user.id) {
+            // 업체정보 업데이트
+            await Company.update(
+                { name, key, mobile, tel, fax, email, memo },
+                { where: { id: company.id} }
+            );
+            company = await Company.findOne({ where: { id: company_id }});
+
+            await SafeManageFee.update(
+                { businessType, voltType, passiveKw, generateKw, sunKw, sum, fee, weight, checking },
+                { where: { company_id } }
+            );
+            const safeManageFee = await SafeManageFee.findOne({ where: { company_id } });
+            
+            let payLoad = { company, safeManageFee };
+            response(res, 200, "업체 수정 페이지", payLoad);
+        } else {
+            response(res, 401, '권한 없음');
+        }
+    } catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러");
+    }
+});
+
+// 업체 삭제
+router.delete('/:company_id/delete', async (req, res, next) => {
+    try {
+        const { user_id } = req.body;
+        const { company_id } = req.params;
+
+        // 로그인 체크
+        if (!user_id) { response(res, 400, '로그인 필요'); return; }
+        if (!company_id) { response(res, 400, "params값 없음"); return; }
 
         // 유저 존재여부 체크
         if (!(await exUser(user_id))) {
@@ -196,23 +265,85 @@ router.delete('/:company_id/edit', async (req, res, next) => {
         }
 
         // 업체 존재여부 체크
+        let company = await Company.findOne({ where: { id: company_id }});
+        if (!company) { response(res, 404, "업체 없음"); return; }
+
+        // 권한 체크
+        if (company.user_id == user.id) {
+            await company.destroy();
+            response(res, 200, "삭제 완료");
+        } else {
+            response(res, 401, "권한 없음");
+        }
+    } catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러");
+    }
+});
+
+// 메모 편집 페이지 이동
+router.get('/:company_id/memo', async (req, res, next) => {
+    try {
+        const { user_id } = req.query;
+        const { company_id } = req.params;
+
+        // 로그인 체크
+        if (!user_id) { response(res, 400, '로그인 필요'); return; }
+        if (!company_id) { response(res, 400, "params값 없음"); return; }
+
+        // 유저 존재여부 체크
+        if (!(await exUser(user_id))) {
+            response(res, 404, "유저 없음");
+            return;
+        }
+
+        const user = await User.findOne({ where: { id: user_id } });
+
+        // 업체 존재여부 체크
         const company = await Company.findOne({ where: { id: company_id }});
         if (!company) { response(res, 404, "업체 없음"); return; }
 
         // 권한 체크
         if (company.user_id == user.id) {
-            // 업체정보 업데이트
-            await Company.update(
-                { name, key, mobile, tel, fax, email, memo },
-                { where: { id: company.id} }
-            );
-            await SafeManageFee.update(
-                { businessType, voltType, passiveKw, generateKw, sunKw, sum, fee, weight, checking },
-                { where: { company_id: company.id } }
-            );
+            let payLoad = { memo: company.memo, company_id };
+            response(res, 200, "메모 편집 페이지", payLoad);
+        } else {
+            response(res, 401, '권한 없음');
+        }
+    } catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러")
+    }    
+});
 
-            let payLoad = { company, safeManageFee };
-            response(res, 200, "업체 수정 페이지", payLoad);
+router.put('/:company_id/memo', async (req, res, next) => {
+    try {
+        const { user_id, memo } = req.query;
+        const { company_id } = req.params;
+
+        // 로그인 체크
+        if (!user_id) { response(res, 400, '로그인 필요'); return; }
+        if (!memo) { memo = ""; }
+        if (!company_id) { response(res, 400, "params값 없음"); return; }
+
+        // 유저 존재여부 체크
+        if (!(await exUser(user_id))) {
+            response(res, 404, "유저 없음");
+            return;
+        }
+
+        const user = await User.findOne({ where: { id: user_id } });
+
+        // 업체 존재여부 체크
+        const company = await Company.findOne({ where: { id: company_id }});
+        if (!company) { response(res, 404, "업체 없음"); return; }
+
+        // 권한 체크
+        if (company.user_id == user.id) {
+            await Company.update({ memo }, { where: { id: company_id } });
+
+            let payLoad = { memo, company_id };
+            response(res, 200, "메모 편집 성공", payLoad);
         } else {
             response(res, 401, '권한 없음');
         }

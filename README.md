@@ -79,6 +79,13 @@
 - /product/product.js => create => forEach 샹노무자식
 - /company/company.js => get, create, get(edit), put(edit)
 
+### 2019.05.31(금)
+#### 라우터 설계
+- /company/company.js => show, delete
+- /company/company.js => memo (edit, put)
+- /billProject/motorLoad.js => create
+- /billProject/normalLoad.js => create
+
 #### 해결해야 할 오류
 - [해결완료] routes/product/product.js => create에서 product의 productOpt와 productThumb값을 받아오지 못함.
 

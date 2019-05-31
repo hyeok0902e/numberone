@@ -37,11 +37,11 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         powerLate: { // 역률 (%)
-            type: DataTypes.DOUBLE(11,2),
+            type: DataTypes.DOUBLE(11,3),
             allowNull: true,
         },
         impowerLate: { // 개선역률 (%)
-            type: DataTypes.DOUBLE(11,2),
+            type: DataTypes.DOUBLE(11,3),
             allowNull: true,
         },
         efficiency: { // 효율 (%)
@@ -49,7 +49,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         demandLate: { // 수용률 (%)
-            type: DataTypes.DOUBLE(11,2),
+            type: DataTypes.DOUBLE(11,3),
             allowNull: true,
         },
         taskWay: { // 기동방식

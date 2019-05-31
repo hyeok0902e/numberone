@@ -57,6 +57,7 @@ router.post('/token', async (req, res, next) => {
             const token = await jwt.sign({
                 user_id: user.id, 
                 email: user.email,
+                uuid: uuidNew,
             }, process.env.JWT_SECRET,{
                 expiresIn: '15m',
                 issuer: 'tlcompany',
@@ -192,46 +193,44 @@ router.post('/signIn', async (req, res, next) => {
         const { email, password } = req.body;
 
         if (email && password) {
-            const user = await User.findOne({ where: { email: email } });
+            let user = await User.findOne({ where: { email: email } });
             
             // 이메일 존재 여부 체크
-            if (!user) {
-                response(res, 400, "존재하지 않는 계정입니다.");
-                return;
-            }
+            if (!user) { response(res, 400, "잘못된 이메일"); return; }
 
             // 비번 일치 여부 체크
             const result = await bcrypt.compare(password, user.password);
-            if (result) {
+            if (!result) { response(res, 400, "잘못된 비밀번호"); return; }
 
-                // 보안 이슈를 위한 jwt 토큰 생성
-                const token = await jwt.sign({
-                    user_id: user.id, 
-                    email: user.email,
-                }, process.env.JWT_SECRET,{
-                    expiresIn: '15m',
-                    issuer: 'tlcompany',
-                });
-                
-                // uuid 업데이트
-                const uuidNew = await uuidv4();
-                await User.update({ uuid: uuidNew }, { where: { id: user.id } });
+            // uuid 업데이트
+            const uuidNew = await uuidv4();
+            await User.update({ uuid: uuidNew }, { where: { id: user.id } });
+            // 업데이트된 유저정보 다시 한 번 가져오기
 
-                let payLoad = {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    profile: user.profile,
-                    birth: user.birth,
-                    gender: user.gender,
-                    level: user.level,
-                    // user.uuid
-                    // token, 
-                };
-                response(res, 200, "로그인 성공", payLoad);
-            } else {
-                response(res, 400, "비밀번호가 일치하지 않습니다.");
-            }
+            // 보안 이슈를 위한 jwt 토큰 생성
+            const token = await jwt.sign({
+                user_id: user.id, 
+                email: user.email,
+                uuid: uuidNew,
+            }, process.env.JWT_SECRET,{
+                expiresIn: '15m',
+                issuer: 'tlcompany',
+            });
+               
+            user = await User.findOne({ where: { email: email } });
+
+            let payLoad = {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                profile: user.profile,
+                birth: user.birth,
+                gender: user.gender,
+                level: user.level,
+                token, 
+            };
+            response(res, 200, "로그인 성공", payLoad);
+     
         } else {
             response(res, 400, "아이디 또는 비번을 입력해 주세요.");
         }
@@ -257,7 +256,7 @@ router.get('/signOut', async (req, res) => {
             let payLoad = { user_id }
             response(res, 200, "로그아웃 완료" , payLoad); 
         } else { // 유저정보가 올바르지 않을 때
-            response(res, 404, "사용자가 존재하지 않습니다.");
+            response(res, 404, "유저 없음");
         }
     } catch (err) {
         console.log(err);
