@@ -55,6 +55,7 @@ router.post('/create', async (req, res, next) => {
         const billProject = await BillProject.findOne({ where: { id: group.billProject_id } });
         if( !BillProject) { response(res, 404, "프로젝트 없음"); return; }
         
+        // 권한 체크
         if (billProject.user_id == user.id) {
             // 전동기 부하 생성
             const motorLoad = await Load.create({ 
@@ -71,10 +72,6 @@ router.post('/create', async (req, res, next) => {
         } else {
             response(res, 401, "권한 없음");
         }
-
-
-
-        // 부하 타입: 2
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");

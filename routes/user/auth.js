@@ -103,7 +103,8 @@ router.post('/signUp', async (req, res, next) => {
             }
 
             // 이메일 중복체크
-            const exUser = await User.findAll({ where: { email: email } });
+            const exUser = await User.findOne({ where: { email: email } });
+            console.log(exUser)
             if (exUser) { response(res, "400", "이메일 중복"); return; }
 
             // 관심목록 입력 여부 체크

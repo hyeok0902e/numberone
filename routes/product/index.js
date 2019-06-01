@@ -6,7 +6,7 @@ const { User, UserAuth, Product, ProductOpt, ProductThumb } = require('../../mod
 // 커스텀 미들웨어
 const { response } = require('../middlewares/response');
 const { productSeeAuth } = require('../middlewares/userAuth');
-const { exUser, verifyToken } = require('../middlewares/main');
+const { exUser, verifyToken, verifyUid } = require('../middlewares/main');
 const { uploadImg } = require('../middlewares/uploadImg');
 
 const router = express.Router();
@@ -14,7 +14,7 @@ const router = express.Router();
 // 장터 목록 가져오기
 router.get('/', async (req, res, next) => {
     try {   
-        const { user_id } = req.body; // query로 바꿔줄 것!
+        const { user_id } = req.query; // query로 바꿔줄 것!
         if (!user_id) { response(res, 400, "로그인 필요"); return; }
         
         // 유저 존재여부 체크
@@ -138,6 +138,40 @@ router.post('/create', async (req, res, next) => {
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러")
+    }
+});
+
+// 제품 상세보기
+router.get('/:product_id/show', async (req, res, next) => {
+    try {
+        const { user_id } = req.query;
+        const { product_id } = req.params;
+
+        if (!user_id) { response(res, 400, "로그인 필요"); return; }
+        if (!product_id) { response(res, 400, "params값 없음"); return; }
+  
+        // 유저 존재여부 체크
+        if (!(await exUser(user_id))) {
+            response(res, 404, "유저 없음");
+            return;
+        }
+
+        const user = await User.findOne({ 
+            where: { id: user_id }, 
+            include: [{ model: UserAuth }], 
+        });
+
+        const product = await Product.findOne({ where: { id: product_id, user_id: user.id } });
+        if (!product) { response(res, 404, "제품 없음"); return; }
+
+        const productOpts = await ProductOpt.findAll({ where: { product_id: product.id } });
+        const productThumbs = await ProductThumb.findAll({ where: { product_id: product.id }});
+
+        let payLoad = { product, productOpts, productThumbs };
+        response(res, 200, "제품 상세정보", payLoad);
+    } catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러");
     }
 });
 

@@ -44,7 +44,7 @@ exports.feeAuth = async (user) => {
 }
 
 // 내역서 등록 권한
-exports.checkStatementAuth = async (user) => {
+exports.statementAuth = async (user) => {
     if ((user.UserAuth.statement > 0)) {
         return true;
     } else {

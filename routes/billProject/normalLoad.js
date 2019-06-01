@@ -10,6 +10,7 @@ const { billAuth } = require('../middlewares/userAuth');
 
 const router = express.Router();
 
+// 일반부하(분전반) 생성
 router.post('/create', async (req, res, next) => {
     try {
         const { 

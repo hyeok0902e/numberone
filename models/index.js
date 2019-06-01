@@ -217,6 +217,8 @@ db.Company.hasMany(db.OpeningPaper, { foreignKey: 'company_id', sourceKey: 'id' 
 /************************ Relation About FeeProject (Start) ************************/
 db.FeeProject.belongsTo(db.Company, { foreignKey: 'company_id', targetKey: 'id' });
 db.Company.hasMany(db.FeeProject, { foreignKey: 'company_id', sourceKey: 'id' });
+db.FeeProject.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
+db.User.hasMany(db.FeeProject, { foreignKey: 'user_id', sourceKey: 'id' })
 
 db.KepcoFee.belongsTo(db.FeeProject, { foreignKey: 'feeProject_id', targetKey: 'id' });
 db.FeeProject.hasOne(db.KepcoFee, { foreignKey: 'feeProject_id', sourceKey: 'id' });

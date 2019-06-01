@@ -27,6 +27,8 @@ router.get('/', async (req, res, next) => {
             attributes: ['id', 'name', 'createdAt', 'voltType', 'loadSimplyCE', 'outputCE', 'elecConvertVal', 'user_id'], 
         });
         
+        if (billProjects.length == 0) { response(res, 404, "목록 없음"); return; }
+
         let payLoad = { billProjects };
         response(res, 200, '계산서 프로젝트 목록', payLoad);
     } catch (err) {
@@ -111,10 +113,10 @@ router.get('/:billProject_id/edit', async (req, res, next) => {
         if (billProject.user_id == user_id) {
             let payLoad = { billProject };
             response(res, 200, '계산서 수정 페이지', payLoad);
+        
         } else {
             response(res, 401, '권한 없음');
         }
-
     } catch (err) {
         console.log(err);
         response(res, 500, '서버 에러');

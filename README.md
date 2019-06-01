@@ -86,6 +86,15 @@
 - /billProject/motorLoad.js => create
 - /billProject/normalLoad.js => create
 
+### 2019.06.01(토)
+#### 라우터 설계
+- /feeProject/index.js => get, create
+- /product/index.js => show 
+- /statement/index.js => get
+#### 모델 관계 수정
+- FeeProject belongsTo User / User hadMany FeeProject
+
+
 #### 해결해야 할 오류
 - [해결완료] routes/product/product.js => create에서 product의 productOpt와 productThumb값을 받아오지 못함.
 

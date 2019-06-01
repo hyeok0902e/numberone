@@ -39,6 +39,7 @@ const indexRouter = require('./routes');
 // user
 const attendanceRouter = require('./routes/user/attendance.js');
 const authRouter = require('./routes/user/auth.js');
+const myPageRouter = require('./routes/myPage/index.js');
 
 // billProject
 const billRouter = require('./routes/billProject/index.js');
@@ -50,10 +51,16 @@ const motorLoadRouter = require('./routes/billProject/motorLoad.js');
 const normalLoadRouter = require('./routes/billProject/normalLoad.js');
 
 //company 
-const compRouter = require('./routes/company/company.js');
+const compRouter = require('./routes/company/index.js');
+
+// feeProject
+const feeRouter = require('./routes/feeProject/index.js');
+
+// statement
+const statementRouter = require('./routes/statement/index.js');
 
 // product
-const productRouter = require("./routes/product/product.js");
+const productRouter = require("./routes/product/index.js");
 /*********************** Router (End) ***********************/
 
 
@@ -126,6 +133,12 @@ app.use('/bill/motorLoad', motorLoadRouter);
 
 // company
 app.use('/company', compRouter);
+
+// feeProject
+app.use('/fee', feeRouter);
+
+// statement
+app.use('/statement', statementRouter);
 
 // Product
 app.use('/product', productRouter);
