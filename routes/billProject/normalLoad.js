@@ -56,7 +56,20 @@ router.post('/create', async (req, res, next) => {
         if( !BillProject) { response(res, 404, "프로젝트 없음"); return; }
 
         // 권한 체크
-        if (billProject.user_id == user.id) {
+        if (billProject.user_id != user.id) {
+            response(res, 401, "권한 없음");
+            return;
+        }
+
+        // 최초등록된 부하 체크 (전동기부하, 전압값-380V)
+        const firstLoad = await Load.findAll({ 
+            limit: 1, 
+            where: { group_id: group.id, type: 2 },
+            order: [['createdAt', 'ASC']]
+        });
+        // 전동기부하가 등록된 그룹일 경우
+        // 최초 등록된 전동기부하의 전압(volt)이 380이어야 등록 가능
+        if ((firstLoad.length == 0) || (firstLoad[0].volt == 380)) {
             // 일반부하(분전반) 생성
             const normalLoad = await Load.create({ 
                 type: 3, name, output, sangSang, sangDiv,
@@ -66,13 +79,15 @@ router.post('/create', async (req, res, next) => {
             });
             // 부하 관계 추가
             await group.addMotorLoad(normalLoad);
+            await billProject.addLoad(normalLoad);
 
             let payLoad = { normalLoad };
-            response(res, 201, "전동기 부하 생성", payLoad);
+            response(res, 201, "전동기 부하 생성", payLoad);  
         } else {
-            response(res, 401, "권한 없음");
+            response(res, 400, "일반부하(분전반) 추가 불가")
         }
-
+              
+     
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");

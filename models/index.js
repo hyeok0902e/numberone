@@ -136,8 +136,8 @@ db.Load.hasMany(db.Load, { as: 'NormalSum', foreignKey: 'group_id' });
 db.Load.hasMany(db.Load, { as: 'NormalLoad', foreignKey: 'normalSum_id' });
 
 // Transformer
-db.Transformer.belongsTo(db.Load, { foreignKey: 'load_id', targetKey: 'id' });
-db.Load.hasOne(db.Transformer, { foreignKey: 'load_id', sourceKey: 'id' });
+db.Transformer.belongsTo(db.Load, { foreignKey: 'bank_id', targetKey: 'id' });
+db.Load.hasOne(db.Transformer, { foreignKey: 'bank_id', sourceKey: 'id' });
 
 // ContractElectricity
 db.ContractElectricity.belongsTo(db.BillProject, { foreignKey: 'billProject_id', targetKey: 'id' });

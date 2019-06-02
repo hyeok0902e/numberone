@@ -94,9 +94,18 @@
 #### 모델 관계 수정
 - FeeProject belongsTo User / User hadMany FeeProject
 
+### 2019.06.02(일)
+#### 라우터 설계
+- billProject/normalLoad.js => create
+- billProject/transformer.js => create
 
-#### 해결해야 할 오류
+## 해결해야 할 오류 & 이슈
 - [해결완료] routes/product/product.js => create에서 product의 productOpt와 productThumb값을 받아오지 못함.
+### 일반부하(분전반) 생성 및 집계시 (06.02)
+- 일반부하(분전반)의 합계 부하를 어떻게 구분할 것인지? 
+    - 사용자 인터페이스 수정(보완)이 필요해 보임
+    - 대표님과 상의할것: 최대한 빨리
+        - 질문1: 3상4선 혹은 1상2선을 선택할 때 추가할 수 있는 분전반의 갯수가 제한이 있는지 (3상4선일 경우 4개, 1상 2선일 경우 3개)
 
 ## ToDo
 - 회원가입 라우터 => 이미 가입한 사용자인지 체크하는 기능 추가

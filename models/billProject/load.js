@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.INTEGER(11),
             allowNull: true,
         },
-        pisnagValA: { // 피상분a (kVA)
+        pisangValA: { // 피상분a (kVA)
             type: DataTypes.DOUBLE(11,2),
             allowNull: true,
         },
