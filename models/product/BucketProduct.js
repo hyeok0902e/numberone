@@ -12,6 +12,15 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.INTEGER(11),
             allowNull: false,
         },
+        createdAt: { // 생성 시간
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+        },
+        updatedAt: { // 업데이트 시간
+            type: DataTypes.DATE,
+            allowNull: true, 
+        },
     }, {
         timestamps: false,
         paranoid: true,

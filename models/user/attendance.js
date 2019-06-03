@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => (
         date: {
             type: DataTypes.DATE,
             allowNull: false,
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+            defaultValue: DataTypes.NOW,
         }
     }, {
         timestamps: false,

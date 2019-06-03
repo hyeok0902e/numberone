@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => (
-    sequelize.define('TestPaper', {
+    sequelize.define('TestPaper', { // 전기설비 점검결과 기록표
         compName: { // 상호명
             type: DataTypes.STRING(255),
             allowNull: false,
@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => (
         checkDate: { // 점검일자
             type: DataTypes.DATE,
             allowNull: false,
+            defaultValue:DataTypes.NOW,
         },
         passiveVolt: { // 수전전압 (V)
             type: DataTypes.INTEGER(11),
@@ -311,14 +312,34 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.STRING(2083),
             allowNull: true,
         },
+        checkerName: {
+            type: DataTypes.STRING(45),
+            allowNull: true,
+        },
         managerSign: { // 안전관리자 사인
             type: DataTypes.STRING(2083),
+            allowNull: true,
+        },
+        managerName: {
+            type: DataTypes.STRING(45),
+            allowNull: true,
+        },
+        userCompName: {
+            type: DataTypes.STRING(255),
+            allowNull: true,
+        },
+        userCompTel: {
+            type: DataTypes.STRING(45),
+            allowNull: true,
+        },
+        userCompFax: {
+            type: DataTypes.STRING(45),
             allowNull: true,
         },
         createdAt: { // 생성 시간
             type: DataTypes.DATE,
             allowNull: false,
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+            defaultValue: DataTypes.NOW,
         },
         updatedAt: { // 업데이트 시간
             type: DataTypes.DATE,

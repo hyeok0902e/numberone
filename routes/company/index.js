@@ -1,7 +1,7 @@
 const express = require('express');
 
 // 모델 import
-const { User, Company, SafeManageFee, UserAuth } = require('../../models');
+const { User, Company, SafeManageFee, UserAuth, Address } = require('../../models');
 
 // 커스텀 미들웨어
 const { response } = require('../middlewares/response');
@@ -90,9 +90,15 @@ router.get('/:company_id/show', async (req, res, next) => {
 // 업체 등록
 router.post('/create', async (req, res, next) => {
     try {
-        const { user_id, name, key, mobile, tel, fax, email, memo,
+        const { 
+            user_id, name, key, mobile, tel, fax, email, memo,
             businessType, voltType, passiveKw, generateKw, sunKw, 
-            sum, fee, weight, checking } = req.body; 
+            sum, fee, weight, checking,
+
+            // 주소 정보
+            jibunAddr, roadFullAddr, roadAddrPart1, roadAddrPart2, engAddr, 
+            zipNo, siNm, sggNm, emdNm, liNm, rn, lnbrMnnm, lnbrSlno, detail,
+        } = req.body; 
 
         // 로그인 여부 체크
         if (!user_id) { response(res, 400, "로그인 필요"); return; }
@@ -130,6 +136,13 @@ router.post('/create', async (req, res, next) => {
         })
         await company.setSafeManageFee(safeManageFee);
 
+        // 주소 생성
+        const address = await Address.create({ 
+            jibunAddr, roadFullAddr, roadAddrPart1, roadAddrPart2, engAddr, 
+            zipNo, siNm, sggNm, emdNm, liNm, rn, lnbrMnnm, lnbrSlno, detail,
+        })
+        await company.setAddress(address);
+
         // 유저 권한 업데이트
         const compManage = user.UserAuth.compManage - 1;
         await UserAuth.update(
@@ -137,7 +150,7 @@ router.post('/create', async (req, res, next) => {
             { where: { user_id: user.id } },
         );    
 
-        let payLoad = { company, safeManageFee };
+        let payLoad = { company, safeManageFee, address };
         response(res, 201, "업체 등록 완료", payLoad); 
     } catch (err) {
         console.log(err);

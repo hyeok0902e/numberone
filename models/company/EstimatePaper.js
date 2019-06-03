@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => (
         launchDate: { // 발행일자
             type: DataTypes.DATE,
             allowNull: false,
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+            defaultValue: DataTypes.NOW,
         },
         receiver: { // 수신 업체
             type: DataTypes.STRING(255),
@@ -64,7 +64,7 @@ module.exports = (sequelize, DataTypes) => (
         createdAt: { // 생성 시간
             type: DataTypes.DATE,
             allowNull: false,
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+            defaultValue: DataTypes.NOW,
         },
         updatedAt: { // 업데이트 시간
             type: DataTypes.DATE,

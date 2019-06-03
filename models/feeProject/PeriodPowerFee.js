@@ -12,11 +12,6 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.INTEGER(2),
             allowNull: true,
         },
-        createdAt: { // 생성 시간
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
-        },
         generateKw: { // 발전용량 (Kw)
             type: DataTypes.INTEGER(11),
             allowNull: true,
@@ -32,6 +27,11 @@ module.exports = (sequelize, DataTypes) => (
         sum: { // 소계
             type: DataTypes.INTEGER(11),
             allowNull: true,
+        },
+        createdAt: { // 생성 시간
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
         },
         updatedAt: { // 업데이트 시간
             type: DataTypes.DATE,

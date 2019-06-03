@@ -10,6 +10,7 @@ const { statementAuth } = require('../middlewares/userAuth');
 
 const router = express.Router();
 
+// 내역서 목록
 router.get('/', async (req, res, next) => {
     try {   
         const { user_id } = req.query;

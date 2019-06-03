@@ -52,6 +52,7 @@ const normalLoadRouter = require('./routes/billProject/normalLoad.js');
 
 //company 
 const compRouter = require('./routes/company/index.js');
+const testPaperRouter = require('./routes/company/testPaper.js');
 
 // feeProject
 const feeRouter = require('./routes/feeProject/index.js');
@@ -133,6 +134,7 @@ app.use('/bill/motorLoad', motorLoadRouter);
 
 // company
 app.use('/company', compRouter);
+app.use('/company/testPaper', testPaperRouter);
 
 // feeProject
 app.use('/fee', feeRouter);

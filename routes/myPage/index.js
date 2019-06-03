@@ -1,7 +1,7 @@
 const express = require('express');
 
 // 모델 import
-const { User, Address } = require('../../models'); 
+const { User, Address,UserAuth } = require('../../models'); 
 
 // 커스텀 미들웨어
 const { response } = require('../middlewares/response');

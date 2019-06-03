@@ -221,7 +221,8 @@ router.post('/signIn', async (req, res, next) => {
             user = await User.findOne({ where: { email: email } });
 
             let payLoad = {
-                id: user.id,
+                user_id: user.id,
+                uuid: uuidNew,
                 name: user.name,
                 email: user.email,
                 profile: user.profile,

@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => (
         checkDate: { // 점검일자
             type: DataTypes.DATE,
             allowNull: false,
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+            defaultValue: DataTypes.NOW,
         },
         manager: { // 안전관리자
             type: DataTypes.STRING(255),
@@ -17,10 +17,22 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.TEXT,
             allowNull: true,
         },
+        userCompName: {
+            type: DataTypes.STRING(255),
+            allowNull: true,
+        },
+        userCompTel: {
+            type: DataTypes.STRING(45),
+            allowNull: true,
+        },
+        userCompFax: {
+            type: DataTypes.STRING(45),
+            allowNull: true,
+        },
         createdAt: { // 생성 시간
             type: DataTypes.DATE,
             allowNull: false,
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+            defaultValue: DataTypes.NOW,
         },
         updatedAt: { // 업데이트 시간
             type: DataTypes.DATE,

@@ -81,10 +81,14 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.TEXT,
             allowNull: true,
         },
+        stage: { // 계산 단계 (상태)
+            type: DataTypes.INTEGER(2),
+            allowNull: true,
+        },
         createdAt: { // 생성 시간
             type: DataTypes.DATE,
             allowNull: false,
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+            defaultValue: DataTypes.NOW,
         },
         updatedAt: { // 업데이트 시간
             type: DataTypes.DATE,
