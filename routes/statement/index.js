@@ -11,29 +11,34 @@ const { statementAuth } = require('../middlewares/userAuth');
 const router = express.Router();
 
 // 내역서 목록
-router.get('/', async (req, res, next) => {
+router.get('/', verifyToken, async (req, res, next) => {
     try {   
-        const { user_id } = req.query;
-
-        if (!user_id) { response(res, 400, "로그인 필요"); return; }
+        // 로그인 체크
+        if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
         
         // 유저 존재여부 체크
-        if (!(await exUser(user_id))) {
-            response(res, 404, "유저 없음");
+        if (!(await exUser(req.decoded.user_id))) {
+            response(res, 404, "사용자가 존재하지 않습니다.");
             return;
         }
 
         const user = await User.findOne({ 
-            where: { id: user_id }, 
+            where: { id: req.decoded.user_id }, 
             include: [{ model: UserAuth }], 
         });
+
+        // 중복 로그인 체크
+        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
+            response(res, 400, "중복 로그인"); 
+            return;
+        }
 
         // 내역서 목록 체크
         const statements = await Statement.findAll({ 
             where: { user_id: user.id }, 
             attributes: ['name', 'contractCost', 'public1', 'public2', 'lastCost'] 
         });
-        if (statements.length == 0) { response(res, 404, "목록 없음"); return; } 
+        if (statements.length == 0) { response(res, 404, "목록이 존재하지 않습니다."); return; } 
 
         let payLoad = { statementAuth };
         response(res, 200, "내역서 목록", payLoad);

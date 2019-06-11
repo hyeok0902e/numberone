@@ -1,12 +1,14 @@
 module.exports = (sequelize, DataTypes) => (
     sequelize.define('Tray', {
         sum: { // 단면적 합계
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.DOUBLE(11, 2),
             allowNull: true,
+            defaultValue: 0,
         },
         convertVal: { // 환산값
             type: DataTypes.DOUBLE(11, 2),
             allowNull: true,
+            defaultValue: 0,
         },
         trayVal: { // 트레이 선정 값
             type: DataTypes.STRING(45),

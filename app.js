@@ -7,6 +7,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const moment = require("moment");
 const AWS = require('aws-sdk');
+const cors = require('cors'); // Cross Origin Resource Sharing
 
 require('dotenv').config();
 
@@ -16,13 +17,6 @@ AWS.config.update({
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     region : 'ap-northeast-2'
 });
-
-// Cross Origin Resource Sharing
-const cors = require('cors');
-const corsOptions = {
-    origin: true,
-    credentials: true
-};
 
 // node-schedule
 const schedule = require('node-schedule'); 
@@ -43,16 +37,24 @@ const myPageRouter = require('./routes/myPage/index.js');
 
 // billProject
 const billRouter = require('./routes/billProject/index.js');
-
-// Load
-const bankRouter = require('./routes/billProject/bank.js');
-const groupRouter = require('./routes/billProject/group.js');
-const motorLoadRouter = require('./routes/billProject/motorLoad.js');
-const normalLoadRouter = require('./routes/billProject/normalLoad.js');
+const loadRouter = require('./routes/billProject/load.js');
+const transformerRouter = require('./routes/billProject/transformer.js');
+const ceRouter = require('./routes/billProject/ce.js');
+const peRouter = require('./routes/billProject/pe.js');
+const condenserRouter = require('./routes/billProject/condenser.js');
+const breakerRouter = require('./routes/billProject/breaker.js');
+const cableRouter = require('./routes/billProject/cable.js');
+const wireCaseRouter = require('./routes/billProject/wireCase.js');
+const trayRouter = require('./routes/billProject/tray.js');
+const generatorRouter = require('./routes/billProject/generator.js');
 
 //company 
 const compRouter = require('./routes/company/index.js');
 const testPaperRouter = require('./routes/company/testPaper.js');
+const rayPaperRouter = require('./routes/company/rayPaper.js');
+const powerPaperRouter = require('./routes/company/powerPaper.js');
+const estimatePaperRouter = require('./routes/company/estimatePaper.js');
+const openingPaperRouter = require('./routes/company/openingPaper.js');
 
 // feeProject
 const feeRouter = require('./routes/feeProject/index.js');
@@ -66,9 +68,6 @@ const productRouter = require("./routes/product/index.js");
 
 
 const app = express();
-
-// Cross Origin Resource Sharing
-app.use(cors(corsOptions));
 
 sequelize.sync();
 // passportConfig(passport);
@@ -114,6 +113,9 @@ app.use(flash());
 // app.use(passport.initialize());
 // app.use(passport.session());
 
+// Cross Origin Resource Sharing
+app.use(cors());
+
 
 /********************** Router URL (Start) **********************/
 app.use('/', indexRouter);
@@ -124,17 +126,24 @@ app.use('/attendance', attendanceRouter);
 
 // billProject
 app.use('/bill/', billRouter);
-app.use('/bill/motorLoad', motorLoadRouter); // 수정필요
-
-// Load
-app.use('/bill/bank', bankRouter);
-app.use('/bill/group', groupRouter)
-app.use('/bill/normalLoad', normalLoadRouter);
-app.use('/bill/motorLoad', motorLoadRouter);
+app.use('/bill/load', loadRouter);
+app.use('/bill/transformer', transformerRouter);
+app.use('/bill/ce', ceRouter);
+app.use('/bill/pe', peRouter);
+app.use('/bill/condenser', condenserRouter);
+app.use('/bill/breaker', breakerRouter);
+app.use('/bill/cable', cableRouter);
+app.use('/bill/wireCase', wireCaseRouter);
+app.use('/bill/tray', trayRouter);
+app.use('/bill/generator', generatorRouter);
 
 // company
 app.use('/company', compRouter);
 app.use('/company/testPaper', testPaperRouter);
+app.use('/company/rayPaper', rayPaperRouter);
+app.use('/company/powerPaper', powerPaperRouter);
+app.use('/company/estimatePaper', estimatePaperRouter);
+app.use('/company/openingPaper', openingPaperRouter);
 
 // feeProject
 app.use('/fee', feeRouter);

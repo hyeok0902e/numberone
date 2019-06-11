@@ -4,32 +4,41 @@ const express = require('express');
 const { User, Load, BillProject, UserAuth } = require('../../models');
 
 // 커스텀 미들웨어
-const { exUser, verifyToken } = require('../middlewares/main');
+const { exUser, verifyToken, verifyUid } = require('../middlewares/main');
 const { response } = require('../middlewares/response');
 const { billAuth } = require('../middlewares/userAuth');
 
 // http://[url]/bill/group
 const router = express.Router();
 
-router.post('/create', async (req, res, next) => {
+router.post('/create', verifyToken, async (req, res, next) => {
     try {
         // load_id => bank_id, name => groupName
-        const { user_id, bank_id, name } = req.body; 
+        const { bank_id, name } = req.body; 
 
-        if (!user_id) { response(res, 400, "로그인 필요"); return; }
-        if (!bank_id) { response(res, 400, "뱅크 없음"); return; }
-        if (!name || (name=="")) { response(res, 400, "입력값 없음"); return; }
+        // 로그인 체크
+        if (!req.decoded.user_id) { response(res, 400, "로그인이 필요합니다."); return; }
+        // 데이터 체크
+        if (!bank_id) { response(res, 400, "데이터 없음"); return; }
+        // 입력값 체크
+        if (!name || (name=="")) { response(res, 400, "값을 입력해 주세요."); return; }
 
         // 유저 존재여부 체크
-        if (!(await exUser(user_id))) {
-            response(res, 404, "유저 없음");
+        if (!(await exUser(req.decoded.user_id))) {
+            response(res, 404, "사용자가 존재하지 않습니다.");
             return;
         }
 
         const user = await User.findOne({ 
-            where: { id: user_id }, 
+            where: { id: req.decoded.user_id }, 
             include: [{ model: UserAuth }], 
         });
+
+        // 중복 로그인 체크
+        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
+            response(res, 400, "중복 로그인"); 
+            return;
+        }
 
         // 계산서 권한 체크
         if (!(billAuth(user))) {
@@ -39,20 +48,20 @@ router.post('/create', async (req, res, next) => {
 
         // 뱅크 존재여부 체크
         const bank = await Load.findOne({ where: { id: bank_id, type: 0 } });
-        if (!bank) { response(res, 404, "뱅크 없음"); return; }
+        if (!bank) { response(res, 404, "뱅크가 존재하지 않습니다."); return; }
 
         // 계산서 존재여부 체크
         const billProject = await BillProject.findOne({ where: { id: bank.billProject_id } });
-        if (!billProject) { response(res, 404, "계산서 없음"); return; }
+        if (!billProject) { response(res, 404, "계산서가 존재하지 않습니다."); return; }
         
         // 접근 권한 체크 
-        if (billProject.user_id == user_id) {
+        if (billProject.user_id == user.id) {
             const group = await Load.create({ name, type: 1 }); // type: 1 => Group
             await bank.addGroup(group);
             await billProject.addLoad(group); // 중요 => BillProject에도 추가
 
             let payLoad = { groupName: group.name, group_id: group.id };
-            response(res, 201, "그룹 생성", payLoad);
+            response(res, 201, "그룹이 생성되었습니다.", payLoad);
         } else {
             response(res, 401, "권한 없음");
         }
@@ -63,26 +72,34 @@ router.post('/create', async (req, res, next) => {
     }
 });
 
-router.put('/:group_id/edit', async (req, res, next) => {
+router.put('/:group_id/edit', verifyToken, async (req, res, next) => {
     try {
-        const { user_id, name } = req.body;
+        const { name } = req.body;
         const { group_id } = req.params;
 
-        // 데이터 유효성 체크
-        if (!user_id) { response(res, 400, "로그인 필요"); return; }
-        if (!group_id) { response(res, 400, "그룹 정보 없음"); return; }
-        if (!name || (name=="")) { response(res, 400, "입력값 없음"); return; }
+        // 로그인 체크
+        if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
+        // params값 체크
+        if (!group_id) { response(res, 400, "params값이 없음"); return; }
+        // 입력값 체크
+        if (!name || (name=="")) { response(res, 400, "값을 입력해 주세요."); return; }
 
         // 유저 존재여부 체크
-        if (!(await exUser(user_id))) {
-            response(res, 404, "유저 없음");
+        if (!(await exUser(req.decoded.user_id))) {
+            response(res, 404, "사용자가 존재하지 않습니다.");
             return;
         }
 
         const user = await User.findOne({ 
-            where: { id: user_id }, 
+            where: { id: req.decoded.user_id }, 
             include: [{ model: UserAuth }], 
         });
+
+        // 중복 로그인 체크
+        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
+            response(res, 400, "중복 로그인"); 
+            return;
+        }
 
         // 계산서 권한 체크
         if (!(await billAuth(user))) {  
@@ -92,11 +109,11 @@ router.put('/:group_id/edit', async (req, res, next) => {
         
         // 그룹 존재여부 체크
         const group = await Load.findOne({ where: { id: group_id, type: 1 } });
-        if (!group) { response(res, 404, "그룹 없음"); return; } 
+        if (!group) { response(res, 404, "그룹이 존재하지 않습니다."); return; } 
 
         // 계산서 존재여부 체크
         const billProject = await BillProject.findOne({ where: { id: group.billProject_id } });
-        if (!billProject) { response(res, 404, "계산서 없음"); return; }
+        if (!billProject) { response(res, 404, "계산서가 존재하지 않습니다."); return; }
 
         // 접근 권한 체크
         if (billProject.user_id == user.id) {
@@ -107,37 +124,41 @@ router.put('/:group_id/edit', async (req, res, next) => {
         } else {
             response(res, 401, "권한 없음");
         }
-
-
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");
     }
 });
 
-router.delete('/:group_id/delete', async (req, res, next) => {
+router.delete('/:group_id/delete', verifyToken, async (req, res, next) => {
     try {
-        const { user_id } = req.body;
         const { group_id } = req.params;
 
-        // 데이터 유효성 체크
-        if (!user_id) { response(res, 400, "로그인 필요"); return; }
-        if (!group_id) { response(res, 400, "그룹 정보 없음"); return; }
+        // 로그인 체크
+        if (!req.decoded.user_id) { response(res, 400, "로그인이 필요합니다."); return; }
+        // params값 체크
+        if (!group_id) { response(res, 400, "params값 없음"); return; }
 
         // 유저 존재여부 체크
-        if (!(await exUser(user_id))) {
-            response(res, 404, "유저 없음");
+        if (!(await exUser(req.decoded.user_id))) {
+            response(res, 404, "사용자가 존재하지 않습니다.");
             return;
         }
 
         const user = await User.findOne({ 
-            where: { id: user_id }, 
+            where: { id: req.decoded.user_id }, 
             include: [{ model: UserAuth }], 
         });
 
+        // 중복 로그인 체크
+        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
+            response(res, 400, "중복 로그인"); 
+            return;
+        }
+        
         // 그룹 존재여부 체크
         const group = await Load.findOne({ where: { id: group_id, type: 1 } });
-        if (!group) { response(res, 404, "그룹 없음"); return; }
+        if (!group) { response(res, 404, "그룹이 존재하지 않습니다."); return; }
         
         // 계산서 권한 체크
         if (!(await billAuth(user))) {  
@@ -147,7 +168,7 @@ router.delete('/:group_id/delete', async (req, res, next) => {
 
         // 계산서 존재여부 체크
         const billProject = await BillProject.findOne({ where: { id: group.billProject_id } });
-        if (!billProject) { response(res, 404, "계산서 없음"); return; }
+        if (!billProject) { response(res, 404, "계산서가 존재하지 않습니다."); return; }
 
         // 접근 권한 체크
         if (billProject.user_id == user.id) {

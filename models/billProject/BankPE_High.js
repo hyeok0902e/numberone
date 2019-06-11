@@ -1,12 +1,14 @@
 module.exports = (sequelize, DataTypes) => (
     sequelize.define('BankPE_High', {
         output: { // 설비용량 (kVA)
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.DOUBLE(11, 2),
             allowNull: true,
+            defaultValue: 0,
         },
         volt: { // 전압 (V)
             type: DataTypes.INTEGER(11),
             allowNull: true,
+            defaultValue: 0,
         },
         pfTrans: { // PF - 한류형
             type: DataTypes.STRING(45),
@@ -19,18 +21,22 @@ module.exports = (sequelize, DataTypes) => (
         secAmpe: { // 2차 전류 (A)
             type: DataTypes.DOUBLE(11, 2),
             allowNull: true,
+            defaultValue: 0,
         },
         secCT125: { // 2차 CT - 1.25배
             type: DataTypes.DOUBLE(11, 2),
             allowNull: true,
+            defaultValue: 0,
         },
         secCT15: { // 2차 CT - 1.5 배 
             type: DataTypes.DOUBLE(11, 2),
             allowNull: true,
+            defaultValue: 0,
         },
         secBreakerCal: { // 2차 차단기 - 계산
             type: DataTypes.DOUBLE(11, 2),
             allowNull: true,
+            defaultValue: 0,
         },
         secBreakerAT: { // 2차 차단기 - AT (AT)
             type: DataTypes.STRING(45),

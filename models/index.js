@@ -25,7 +25,6 @@ db.BillProject = require('./billProject/BillProject')(sequelize, Sequelize);
 db.Load = require('./billProject/Load')(sequelize, Sequelize);
 db.Transformer = require('./billProject/Transformer')(sequelize, Sequelize);
 db.ContractElectricity = require('./billProject/ContractElectricity')(sequelize, Sequelize);
-db.SimplyForCE = require('./billProject/SimplyForCE')(sequelize, Sequelize);
 db.PE_Low = require('./billProject/PE_Low')(sequelize, Sequelize);
 db.MainPE_High = require('./billProject/MainPE_High')(sequelize, Sequelize);
 db.BankPE_High = require('./billProject/BankPE_High')(sequelize, Sequelize);
@@ -131,9 +130,14 @@ db.BillProject.hasMany(db.Load, { foreignKey: 'billProject_id', sourceKey: 'id' 
 
 // Internal Reference Of Load 
 db.Load.hasMany(db.Load, { as: 'Group', foreignKey: 'bank_id' });
-db.Load.hasMany(db.Load, { as: 'MotorLoad', foreignKey: 'group_id' });
-db.Load.hasMany(db.Load, { as: 'NormalSum', foreignKey: 'group_id' });
+db.Load.belongsTo(db.Load, { through: 'Group', foreignKey: 'bank_id' });
+db.Load.hasMany(db.Load, { as: 'MotorLoad', foreignKey: 'groupMotor_id' });
+db.Load.belongsTo(db.Load, { through: 'MotorLoad', foreignKey: 'groupMotor_id' });
+db.Load.hasMany(db.Load, { as: 'NormalSum', foreignKey: 'groupNormal_id' });
+db.Load.belongsTo(db.Load, { through: 'NormalSum', foreignKey: 'groupNormal_id' });
 db.Load.hasMany(db.Load, { as: 'NormalLoad', foreignKey: 'normalSum_id' });
+db.Load.belongsTo(db.Load, { through: 'NormalLoad', foreignKey: 'normalSum_id' });
+
 
 // Transformer
 db.Transformer.belongsTo(db.Load, { foreignKey: 'bank_id', targetKey: 'id' });
@@ -142,8 +146,6 @@ db.Load.hasOne(db.Transformer, { foreignKey: 'bank_id', sourceKey: 'id' });
 // ContractElectricity
 db.ContractElectricity.belongsTo(db.BillProject, { foreignKey: 'billProject_id', targetKey: 'id' });
 db.BillProject.hasMany(db.ContractElectricity, { foreignKey: 'billProject_id', sourceKey: 'id' });
-db.SimplyForCE.belongsTo(db.Load, { foreignKey: 'load_id', targetKey: 'id' });
-db.Load.hasOne(db.SimplyForCE, { foreignKey: 'load_id', sourceKey: 'id' });
 
 // PE_Low
 db.PE_Low.belongsTo(db.BillProject, { foreignKey: 'billProject_id', targetKey: 'id' });

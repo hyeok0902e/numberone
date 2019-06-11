@@ -5,7 +5,7 @@ const moment = require('moment');
 const { User, Attendance, Sequelize } = require('../../models');
 
 // 커스텀 미들웨어
-const { exUser, verifyToken } = require('../middlewares/main');
+const { exUser, verifyToken, verifyUid } = require('../middlewares/main');
 const { response } = require('../middlewares/response');
 
 // for findAll using range
@@ -14,19 +14,23 @@ const Op = Sequelize.Op;
 const router = express.Router(); 
 
 // 출석 체크
-router.post('/', async (req, res, next) => {
+router.post('/', verifyToken, async (req, res, next) => {
     try { 
-        const { user_id } = req.body;
+        // 로그인 체크
+        if (!req.decoded) { responser(res, 400, "로그인 필요"); return; }
 
-        if (!user_id) { response(res, 400, "유저 없음"); return; }
-        
         // 유저 존재여부 체크
-        if (!(await exUser(user_id))) {
+        if (!(await exUser(req.decoded.user_id))) {
             response(res, 404, "유저 없음");
             return;
         }
 
+        // 중복 로그인 체크
         const user = await User.findOne({ where: { id: user_id }});
+        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
+            response(res, 400, "중복 로그인"); 
+            return;
+        }
 
         // 금일 날짜
         const today = moment(Date.now()).format('YYYY-MM-DD');
@@ -59,11 +63,11 @@ router.post('/', async (req, res, next) => {
 
             let payLoad = { today_attendances };
             console.log(today_attendances);
-            response(res, 201, '출석체크 완료', payLoad); 
+            response(res, 201, '출석체크를 완료하였습니다.', payLoad); 
         } else  { 
             // 출석이 되어 있을 때
             let payLoad = { today_attendances };
-            response(res, 400, '이미 출석함', payLoad);  
+            response(res, 400, '이미 출석체크가 되어 있습니다.', payLoad);  
         }
   
     } catch (err) {

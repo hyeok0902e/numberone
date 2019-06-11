@@ -7,7 +7,7 @@ const uuidv4 = require('uuid/v4');
 const { User, UserPick, UserAuth } = require('../../models'); // address 추가 필요
 
 // 커스텀 미들웨어
-const { exUser, verifyToken } = require('../middlewares/main');
+const { exUser, verifyToken, verifyUid } = require('../middlewares/main');
 const { response } = require('../middlewares/response');
 const { uploadImg } = require('../middlewares/uploadImg');
 
@@ -17,10 +17,12 @@ const router = express.Router();
 // 프로필 사진 업로드 - S3
 router.post('/imgUpload', uploadImg.single('image'), (req, res) => {
     try {
-        console.log("req.file: ", req.file);
-
-        let payLoad = { profileUrl: req.file.location };
-        response(res, 201, "프로필 등록 성공", payLoad);
+        if (!req.file) {
+            response(res, 400, "이미지가 첨부되지 않았습니다.");
+        } else {
+            let payLoad = { profileUrl: req.file.location };
+            response(res, 201, "프로필 등록 성공", payLoad);
+        }
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러")
@@ -34,12 +36,12 @@ router.post('/token', async (req, res, next) => {
         const { user_id, uuid } = req.body;
 
         // 데이터 유효성 체크
-        if (!user_id) { response(res, 400, "로그인 필요"); return; }
-        if (!uuid) { response(res, 400, "사용자의 세션정보 없음"); return; }
+        if (!user_id) { response(res, 400, "로그인이 필요합니다."); return; }
+        if (!uuid) { response(res, 400, "실패 - 사용자의 세션정보 없음"); return; }
 
         // 유저 존재여부 체크
         if (!(await exUser(user_id))) {
-            response(res, 404, "사용자 없음");
+            response(res, 404, "사용자가 존재하지 않습니다.");
             return;
         }
 
@@ -49,7 +51,6 @@ router.post('/token', async (req, res, next) => {
         if (user.uuid == uuid) {
             // uuid 갱신
             const uuidNew = await uuidv4();
-
             // 사용자 uuid 값 업데이트
             await User.update({ uuid: uuidNew }, { where: { id: user_id } })
 
@@ -59,21 +60,19 @@ router.post('/token', async (req, res, next) => {
                 email: user.email,
                 uuid: uuidNew,
             }, process.env.JWT_SECRET,{
-                expiresIn: '15m',
+                expiresIn: '30m',
                 issuer: 'tlcompany',
             });
 
             let payLoad = { user_id, uuid: uuidNew, token }
-            response(res, 200, "토큰 및 uuid 갱신 성공", payLoad);
+            response(res, 200, "토큰 및 uuid를 업데이트 하였습니다.", payLoad);
         } else {
             response(res, 401, "권한 없음");
         }
-   
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");
-    }
-    
+    }  
 });
 
 // 회원가입
@@ -98,14 +97,14 @@ router.post('/signUp', async (req, res, next) => {
             && level && productAuth && marketAuth) { // 반드시 입력받아야 하는 값들
             
             if (password != password2) {
-                response(res, 400, "비밀번호가 불일치");
+                response(res, 400, "비밀번호가 일치하지 않습니다.");
                 return;
             }
 
             // 이메일 중복체크
             const exUser = await User.findOne({ where: { email: email } });
             console.log(exUser)
-            if (exUser) { response(res, "400", "이메일 중복"); return; }
+            if (exUser) { response(res, "400", "중복된 이메일 입니다."); return; }
 
             // 관심목록 입력 여부 체크
             if ((!userPicks) || (userPicks == [])) {
@@ -115,7 +114,7 @@ router.post('/signUp', async (req, res, next) => {
 
             // 주소를 입력하지 않았을 때 response 작성 필요!
             // if (!jibunAddr || !roadFullAddr) {
-            //     response(res, 400, "주소 없음");
+            //     response(res, 400, "주소를 입력해 주세요.");
             //     return
             // }
 
@@ -149,20 +148,9 @@ router.post('/signUp', async (req, res, next) => {
             // });
             // await user.setAddress(address)
 
-            // 응답
-            let payLoad = {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                profile: user.profile,
-                birth: user.birth,
-                gender: user.gender,
-                level: user.level,
-                // address: roadFullAddr,
-            };
-            response(res, 201, "회원가입 성공", payLoad);
+            response(res, 201, "회원가입을 완료하였습니다.");
         } else {
-            response(res, 400, "입력값 없음")
+            response(res, 400, "값을 입력해 주세요.")
         }
     } catch (err) {
         console.log(err);
@@ -178,9 +166,9 @@ router.get('/doublCheckEmail', async (req, res, next) => {
         const user = await User.findOne({ where: { email: email }});
         console.log(user);
         if (user) {
-            response(res, 400, "이미 존재하는 이메일입니다.");
+            response(res, 400, "이미 존재하는 이메일 입니다.");
         } else {
-            response(res, 200, "이메일 중복체크 완료");           
+            response(res, 200, "사용 가능한 이메일 입니다.");           
         }
     } catch (err) {
         console.log(err);
@@ -197,11 +185,11 @@ router.post('/signIn', async (req, res, next) => {
             let user = await User.findOne({ where: { email: email } });
             
             // 이메일 존재 여부 체크
-            if (!user) { response(res, 400, "잘못된 이메일"); return; }
+            if (!user) { response(res, 400, "잘못된 이메일 입니다."); return; }
 
             // 비번 일치 여부 체크
             const result = await bcrypt.compare(password, user.password);
-            if (!result) { response(res, 400, "잘못된 비밀번호"); return; }
+            if (!result) { response(res, 400, "잘못된 비밀번호 입니다."); return; }
 
             // uuid 업데이트
             const uuidNew = await uuidv4();
@@ -214,7 +202,7 @@ router.post('/signIn', async (req, res, next) => {
                 email: user.email,
                 uuid: uuidNew,
             }, process.env.JWT_SECRET,{
-                expiresIn: '15m',
+                expiresIn: '60m', // 나중에 30m으로 변경
                 issuer: 'tlcompany',
             });
                
@@ -223,18 +211,18 @@ router.post('/signIn', async (req, res, next) => {
             let payLoad = {
                 user_id: user.id,
                 uuid: uuidNew,
+                token, 
                 name: user.name,
                 email: user.email,
                 profile: user.profile,
                 birth: user.birth,
                 gender: user.gender,
-                level: user.level,
-                token, 
+                level: user.level,   
             };
-            response(res, 200, "로그인 성공", payLoad);
+            response(res, 200, "로그인에 성공하였습니다.", payLoad);
      
         } else {
-            response(res, 400, "아이디 또는 비번을 입력해 주세요.");
+            response(res, 400, "값을 입력해 주세요.");
         }
     } catch (err) {
         console.log(err);
@@ -243,23 +231,25 @@ router.post('/signIn', async (req, res, next) => {
 });
 
 // 로그아웃
-router.get('/signOut', async (req, res) => {
-    const { user_id } = req.query;
-
+router.get('/signOut', verifyToken, async (req, res, next) => {
     try {
-        // req 정보에 사용자가 없거나, user_id 값이 없을 때
-        if (!user_id) {
-            response(res, 400, '로그인된 사용자 없음');
+        // 로그인 체크
+        if (!req.decoded) { responser(res, 400, "로그인이 필요합니다."); return; }
+        
+        // 유저 존재여부 체크
+        if (!(await exUser(req.decoded.user_id))) {
+            response(res, 404, "사용자가 존재하지 않습니다.");
             return;
         }
-        
-        // 유저 존재여부 체크 및 로그아웃       
-        if (await exUser(user_id)) {
-            let payLoad = { user_id }
-            response(res, 200, "로그아웃 완료" , payLoad); 
-        } else { // 유저정보가 올바르지 않을 때
-            response(res, 404, "유저 없음");
+
+        // 중복 로그인 체크
+        const user = await User.findOne({ where: { id: req.decoded.user_id } });
+        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
+            response(res, 400, "중복 로그인"); 
+            return;
         }
+
+        response(res, 200, "로그아웃 성공 - 세션에 저장된 사용자 정보 및 토큰 삭제");
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");

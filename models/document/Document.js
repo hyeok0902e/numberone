@@ -1,5 +1,9 @@
 module.exports = (sequelize, DataTypes) => (
     sequelize.define('Document', {
+        num: {
+            type: DataTypes.INTEGER(11),
+            allowNull: false,
+        },
         fileName: {
             type: DataTypes.STRING(512),
             allowNull: true,

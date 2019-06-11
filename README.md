@@ -98,6 +98,56 @@
 #### 라우터 설계
 - billProject/normalLoad.js => create
 - billProject/transformer.js => create
+- 계산서(billProject) 라우터 세팅 (+ app.js) => load.js ~ generator.js
+
+
+### 2019.06.03(월)
+#### 라우터 설계
+- company/testPaper => copy, create, get ..
+- testPaper Router에 verifyToken, verifyUid 적용
+#### 기타 코드 변경
+- change "sequelize current date timestamp code" 
+- 업체 기록표 테이블들에 user 정보 추가 => db drop & create 
+
+### 2019.06.05(수)
+#### 라우터 개발
+- normalLoad => createEnd => 부모 분전반 데이터 계산 및 업데이트
+
+### 2019.06.06(목)
+#### 개발 방향 대폭 수정
+- 계산서 라우터 => 최초 기획안 대로 심플하게 수정 (세부항목이 아닌 단계별 저장)
+#### router
+- 파일명 변경 bank.js => load.js: 기존 라우터 닫음 ("_[url]" 처리) => 맨 위부터 새 라우터 작성
+- billProject 내부 파일 닫음 ("_[파일명]" 처리)
+- billProject/load.js => create
+
+### 2019.06.07(금)
+#### router
+- billProject/load.js => create => forEach로 변경
+
+### 2019.06.08(토)
+#### router 
+- billProject/load.js => create => resonse 데이터 => 계산서 전압수전 타입에 따라 다름
+- 
+
+### 2019.06.09(일)
+#### router 
+- billProject/ce.js
+- billProject/transformer.js
+
+### 2019.06.10(월)
+#### 기획서 및 DB수정
+- Document(자료실)에 '순번' 속성 추가
+- SimplyForCE.js(테이블) 삭제: load부분에 필요 데이터 추가 => 워크벤치는 수정 안하고 남겨둠
+#### router
+- billProject/ce.js => create
+#### 검토할 부분
+- 다음 단계 계산서 시작 시, 전 계산서 DB create 직후가 아닌, 페이지 로드 시 (get) 필요데이터를 뿌려주어야 할까? => front와 상의 할 것
+
+### 2019.06.11(화)
+#### router
+- billProject/pe.js => high/create, low/create
+
 
 ## 해결해야 할 오류 & 이슈
 - [해결완료] routes/product/product.js => create에서 product의 productOpt와 productThumb값을 받아오지 못함.
@@ -106,14 +156,19 @@
     - 사용자 인터페이스 수정(보완)이 필요해 보임
     - 대표님과 상의할것: 최대한 빨리
         - 질문1: 3상4선 혹은 1상2선을 선택할 때 추가할 수 있는 분전반의 갯수가 제한이 있는지 (3상4선일 경우 4개, 1상 2선일 경우 3개)
+            - 해결 완료 => 갯수 제한 없음(자유로움) 단 상/구분 선택시 상위 분전반 Row의 이름 Save => 최종 완료 버튼 클릭 시 상위 분전반 Row 데이터 업데이트
+
 
 ## ToDo
-- 회원가입 라우터 => 이미 가입한 사용자인지 체크하는 기능 추가
-- image upload to s3
-- 만들어 놓은 exUser 미들웨어로 코드 교체
+- [완료] 회원가입 라우터 => 이미 가입한 사용자(이메일 중복)인지 체크하는 기능 추가
+- [완료] image upload to s3
+- [완료] 만들어 놓은 exUser 미들웨어로 코드 교체
 - API Version Routing (ex => /V1/bill/create)
-- JWT Token & CleintSecret(uuid) 사용하여 로그인 인증/보안 구축
+- [완료] JWT Token & CleintSecret(uuid) 사용하여 로그인 인증/보안 구축
     - uuid => const uuidv4 = require('uuid/v4'); => node 교과서 411p
+- [완료] 모든 라우터에 verifyToken, verifyUid 미들웨어 적용하기
+- response 메세지 수정하기: 사용자 친화적으로
+- sequelize Pagenation
 
 ## 모델생성 및 관계세팅 진행률
 - company & paper - 100%

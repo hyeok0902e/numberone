@@ -8,17 +8,28 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.INTEGER(2),
             allowNull: false,
         },
+        transformerKva: { // 변압기 전체 용량 => 변압기 계산시 저장
+            type: DataTypes.DOUBLE(11, 2),
+            allowNull: true,
+        },
+        volt: { 
+            // 총 전압: 각 부하의 가장 최상의 전압 => 변압기 or 계약전력 계산시 저장
+            // 계약전력 계산 시 => 프로젝트 저압수전에 따라 규칙 다름
+            type: DataTypes.INTEGER(11),
+            allowNull: true,
+        },
         elecConvertVal: { // 계약전력 환산값 합계 - 계약전력 계산시 저장 (kW)
             type: DataTypes.DOUBLE(11,2),
             allowNull: true,
+            defaultValue: 0,
         },
         loadSimplyCE: { // 부하집계에 의한 계약전력 - 계약전력 계산시 저장 (kW)
-            type: DataTypes.TINYINT(1),
+            type: DataTypes.DOUBLE(11, 2),
             allowNull: false,
             defaultValue: 0,
         },
         outputCE: { // 설비용량에 의한 계약전력 (변압기계산의 사용자입력값 합계) - 계약전력 계산시 저장 (kVA)
-            type: DataTypes.TINYINT(1),
+            type: DataTypes.DOUBLE(11, 2),
             allowNull: false,
             defaultValue: 0,
         },
@@ -84,6 +95,7 @@ module.exports = (sequelize, DataTypes) => (
         stage: { // 계산 단계 (상태)
             type: DataTypes.INTEGER(2),
             allowNull: true,
+            defaultValue: 0,
         },
         createdAt: { // 생성 시간
             type: DataTypes.DATE,

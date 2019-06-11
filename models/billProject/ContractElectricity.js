@@ -5,16 +5,19 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         convertLate: { // 환산율 (%)
-            type: DataTypes.DOUBLE(11, 2),
+            type: DataTypes.DOUBLE(11, 3),
             allowNull: true,
+            defaultValue: 0,
         },
         convertVal: { // 계약집계 환산값 (kW)
             type: DataTypes.DOUBLE(11, 2),
             allowNull: true,
+            defaultValue: 0,
         },
         calculateVal: { // 계산값 (kW)
             type: DataTypes.DOUBLE(11, 2),
             allowNull: true,
+            defaultValue: 0,
         },
         createdAt: { // 생성 시간
             type: DataTypes.DATE,

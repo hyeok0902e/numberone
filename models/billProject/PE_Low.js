@@ -1,8 +1,9 @@
 module.exports = (sequelize, DataTypes) => (
     sequelize.define('PE_Low', {
         loadSimplyCE: { // 부하 계약전력 합계 (kW)
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.DOUBLE(11, 2),
             allowNull: true,
+            defaultValue: 0,
         },
         volt: { // 전압 (V)
             type: DataTypes.INTEGER(11),
@@ -23,22 +24,27 @@ module.exports = (sequelize, DataTypes) => (
         firstAmpe: { // 1차 전류 (A)
             type: DataTypes.DOUBLE(11, 2),
             allowNull: true,
+            defaultValue: 0,
         },
         firstCT125: { // 1차 CT - 1.25배
             type: DataTypes.DOUBLE(11, 2),
             allowNull: true,
+            defaultValue: 0,
         },
         firstCT15: { // 1차 CT - 1.5배
             type: DataTypes.DOUBLE(11, 2),
             allowNull: true,
+            defaultValue: 0,
         },
         secBreakerCal: { // 2차 차단기 - 계산
             type: DataTypes.DOUBLE(11, 2),
             allowNull: true,
+            defaultValue: 0,
         }, 
         secBreakerAT: { // 2차 차단기 - AT (AT)
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.DOUBLE(11, 2),
             allowNull: true,
+            defaultValue: 0,
         },
         createdAt: {
             type: DataTypes.DATE,

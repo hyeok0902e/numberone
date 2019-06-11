@@ -12,21 +12,27 @@ const { uploadImg } = require('../middlewares/uploadImg');
 const router = express.Router();
 
 // 장터 목록 가져오기
-router.get('/', async (req, res, next) => {
+router.get('/', verifyToken, async (req, res, next) => {
     try {   
-        const { user_id } = req.query; // query로 바꿔줄 것!
-        if (!user_id) { response(res, 400, "로그인 필요"); return; }
+        // 로그인 체크
+        if (!req.decoded.user_id) { response(res, 400, "로그인이 필요합니다."); return; }
         
         // 유저 존재여부 체크
-        if (!(await exUser(user_id))) {
-            response(res, 404, "유저 없음");
+        if (!(await exUser(req.decoded.user_id))) {
+            response(res, 404, "사용자가 존재하지 않습니다.");
             return;
         }
 
         const user = await User.findOne({ 
-            where: { id: user_id }, 
+            where: { id: req.decoded.user_id }, 
             include: [{ model: UserAuth }], 
         });
+
+        // 중복 로그인 체크
+        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
+            response(res, 400, "중복 로그인"); 
+            return;
+        }
 
         // 장터 이용(보기) 권한 체크
         if (!(await productSeeAuth(user))) {
@@ -46,7 +52,7 @@ router.get('/', async (req, res, next) => {
             let payLoad = { products };
             response(res, 200, "장터 목록", payLoad);
         } else {
-            response(res, 404, "장터 목록 없음");
+            response(res, 404, "목록이 존재하지 않습니다.");
         }
     } catch (err) {
         console.log(err);
@@ -55,7 +61,7 @@ router.get('/', async (req, res, next) => {
 });
 
 // 제품 사진 등록
-router.post('/imgUpload', uploadImg.single('image'), (req, res) => {
+router.post('/imgUpload', verifyToken, uploadImg.single('image'), (req, res) => {
     try {
         console.log("req.file: ", req.file); 
 
@@ -63,30 +69,39 @@ router.post('/imgUpload', uploadImg.single('image'), (req, res) => {
         response(res, 201, "제품 사진 등록 성공", payLoad);
     } catch (err) {
         console.log(err);
-        response(res, 500, "서버 에러")``
+        response(res, 500, "서버 에러")
     }
 });
 
 // 제품 등록
-router.post('/create', async (req, res, next) => {
+router.post('/create', verifyToken, async (req, res, next) => {
     try {
-        const { user_id, name, category, quantity, optNames, prices, urls } 
-            = req.body;
+        const { name, category, quantity, optNames, prices, urls } = req.body;
 
+        // 로그인 체크
+        if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
         // 입력값 체크
-        if (!user_id) { response(res, 400, "로그인 필요"); return; }
         if (!name || !category || !optNames || !prices || !urls) { 
-            response(res, 400, "입력값 없음"); 
+            response(res, 400, "값을 제대로 입력해 주세요."); 
             return; 
         }
 
         // 유저 존재여부 체크
-        if (!(await exUser(user_id))) { 
-            response(res, 404, "유저 없음"); 
-            return; 
-        }      
+        if (!(await exUser(req.decoded.user_id))) {
+            response(res, 404, "사용자가 존재하지 않습니다.");
+            return;
+        }  
         
-        const user = await User.findOne({ where: { id: user_id }, include: [{ model: UserAuth }], });
+        const user = await User.findOne({ 
+            where: { id: req.decoded,user_id }, 
+            include: [{ model: UserAuth }], 
+        });
+
+        // 중복 로그인 체크
+        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
+            response(res, 400, "중복 로그인"); 
+            return;
+        }
 
         // 장터 이용(보기) 권한 체크
         if (!(await productSeeAuth(user))) { response(res, 401, "권한 없음"); return; }
@@ -98,7 +113,7 @@ router.post('/create', async (req, res, next) => {
         // ProductOpt 생성
         var num = 0
         if (optNames) {   
-            for (i = 0; i < optNames.length; i++) {
+            for (var i = 0; i < optNames.length; i++) {
                 const productOpt = await ProductOpt.create({ name: optNames[i], price: prices[i] })
                     .then(async productOpt => { await product.addProductOpt(productOpt); })
                     .catch(async err => { 
@@ -112,7 +127,7 @@ router.post('/create', async (req, res, next) => {
         
         // ProductThumb 생성
         if (urls) {
-            for (i = 0; i < urls.length; i++) {
+            for (var i = 0; i < urls.length; i++) {
                 const productThumb = await ProductThumb.create({ url: urls[i] })
                     .then(async productThumb => { await product.addProductThumb(productThumb); })
                     .catch(async err => { 
@@ -133,8 +148,7 @@ router.post('/create', async (req, res, next) => {
         });
         
         let payLoad = { product: product };
-        response(res, 201, "제품 등록됨", payLoad);
-
+        response(res, 201, "제품이 등록되었습니다.", payLoad);
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러")
@@ -142,7 +156,7 @@ router.post('/create', async (req, res, next) => {
 });
 
 // 제품 상세보기
-router.get('/:product_id/show', async (req, res, next) => {
+router.get('/:product_id/show', verifyToken, async (req, res, next) => {
     try {
         const { user_id } = req.query;
         const { product_id } = req.params;
@@ -176,7 +190,7 @@ router.get('/:product_id/show', async (req, res, next) => {
 });
 
 // 제품 편집 페이지 이동
-router.get('/:product_id/edit', async (req, res, next) => {
+router.get('/:product_id/edit', verifyToken, async (req, res, next) => {
     try {
 
     } catch (err) {
@@ -186,7 +200,7 @@ router.get('/:product_id/edit', async (req, res, next) => {
 });
 
 // 제품 편집
-router.put('/:product_id/edit', async (req, res, next) => {
+router.put('/:product_id/edit', verifyToken, async (req, res, next) => {
     try {
 
     } catch (err) {
@@ -196,7 +210,7 @@ router.put('/:product_id/edit', async (req, res, next) => {
 });
 
 // 제품 삭제
-router.delete('/:product_id/delete', async (req, res, next) => {
+router.delete('/:product_id/delete', verifyToken, async (req, res, next) => {
     try {
 
     } catch (err) {

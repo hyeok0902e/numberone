@@ -8,13 +8,13 @@ const { response } = require('./response');
 
 exports.verifyToken = (req, res, next) => {
     try {
-        req.decoded = jwt.verify(req.headers.authorization, process.env.JWT_SECRET)
+        req.decoded = jwt.verify(req.headers.authorization, process.env.JWT_SECRET);
         return next();
     } catch (err) {
         if (err.name === 'TokenExpiredError') {
             response(res, 419, "토큰 만료");
         } else {
-            response(res, 401, "토큰이 유효하지 않습니다.");
+            response(res, 401, "권한 없음");
         }
     }   
 }
@@ -49,3 +49,8 @@ exports.verifyUid = async (tID, uID) => {
     }
 } 
 
+exports.asyncForEach = async (array, callback) => {
+    for (let i = 0; i < array.length; i++) {
+        await callback(array[i], i ,array);
+    }
+}
