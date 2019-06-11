@@ -1,7 +1,7 @@
 const express = require('express');
 
 // 모델 import
-const { User, Address, UserAuth, BillProject, Load, ContractElectricity } = require('../../models'); 
+const { User, Address, UserAuth, BillProject, Load, Transformer, ContractElectricity } = require('../../models'); 
 
 // 커스텀 미들웨어
 const { response } = require('../middlewares/response');
@@ -69,12 +69,29 @@ router.post('/create', verifyToken, async (req, res, next) => {
             { where: { id: billProject_id } }
         )
 
+        let payLoad = { };
         // 프로젝트에 전체 전압 저장 필요
         if (billProject.voltType == 0) { // 고압 수전일 때 => 계산서 전압은 22900 고정
             await BillProject.update(
                 { volt: 22900 },
                 { where: { id: billProject_id } }
             );
+            
+            // 고압 수전 일 때 payLoad
+            billProject = await BillProject.findOne({
+                where: { id: billProject_id },
+                attributes: ['id', 'voltType' , 'transformerKva', 'volt'],
+                include: [{ 
+                    model: Load, 
+                    where: { type: 0 },
+                    attributes: ['id', 'volt'],
+                    include: [{
+                        model: Transformer,
+                        attributes: ['userVal'],
+                    }] 
+                }]
+            });
+            payLoad = { billProject };
         } else { // 저압 수전일 때 => 계산서 전압은 220 or 380
             const banks = await Load.findAll({ where: { billProject_id, type: 0 } });
             let volt = 0;
@@ -85,17 +102,16 @@ router.post('/create', verifyToken, async (req, res, next) => {
                     volt = 220;
                 }
             });
-
             await BillProject.update({ volt }, { where: { id: billProject_id }});
+            // 저압 수전일 때 payLoad
+            billProject = await BillProject.findOne({
+                where: { id: billProject_id },
+                attributes: ['id', 'voltType', 'loadSimplyCE', 'volt']
+            });
+            payLoad = { billProject }
         }
 
-        billProject = await BillProject.findOne({
-            where: { id: billProject_id },
-            attributes: ['id', 'voltType', 'loadSimplyCE', 'volt']
-        });
-        let payLoad = {
-            billProject
-        }
+        
 
         response(res, 201, "계약전력 생성 성공", payLoad);
     } catch (err) {

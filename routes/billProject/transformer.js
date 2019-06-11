@@ -76,11 +76,8 @@ router.post('/create', verifyToken, async (req, res, next) => {
                     attributes: ['userVal'],
                 }] 
             }]
-        })
-
-        let payLoad = { 
-            billProject,
-        };
+        });
+        let payLoad = { billProject };
 
         response(res, 201, "변압기 데이터 생성 성공", payLoad);
     } catch (err) {
