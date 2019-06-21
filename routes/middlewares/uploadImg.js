@@ -18,3 +18,35 @@ exports.uploadImg = multer({
     }),
     limits: { fileSize: 5 * 1024 * 1024 },
 });
+
+// 프로필
+exports.uploadImg_profile = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: "numberone-s3-userinfo/profile",
+        contentType: multerS3.AUTO_CONTENT_TYPE, 
+        acl: 'public-read',
+        key: (req, file, cb) => {
+            console.log(file);
+            console.log(cb);
+            cb(null, file.originalname)
+        },
+    }),
+    limits: { fileSize: 5 * 1024 * 1024 },
+});
+
+// 적외선열화상 기록표
+exports.uploadImg_rayPaper = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: "numberone-s3-userinfo/rayPaper",
+        contentType: multerS3.AUTO_CONTENT_TYPE, 
+        acl: 'public-read',
+        key: (req, file, cb) => {
+            console.log(file);
+            console.log(cb);
+            cb(null, file.originalname)
+        },
+    }),
+    limits: { fileSize: 5 * 1024 * 1024 },
+});

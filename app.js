@@ -83,7 +83,15 @@ schedule.scheduleJob('0 0 0 */1 * *', async () => {
         if (ua.period > 0) {
             var period = ua.period - 1
             await ua.update({ period });
-        } 
+        } else {
+            ua.billSimply = 0;
+            ua.organization = 0;
+            ua.material = 0;
+            ua.document = 0;
+            ua.product = 0;
+            ua.jobSearch = 0;
+            ua.marketPrice = 0;
+        }
     }); 
     console.log('a')
 });

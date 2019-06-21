@@ -9,13 +9,13 @@ const { User, UserPick, UserAuth, Address } = require('../../models'); // addres
 // 커스텀 미들웨어
 const { exUser, verifyToken, verifyUid, asyncForEach } = require('../middlewares/main');
 const { response } = require('../middlewares/response');
-const { uploadImg } = require('../middlewares/uploadImg');
+const { uploadImg_profile } = require('../middlewares/uploadImg');
 
 const router = express.Router();
 
 
 // 프로필 사진 업로드 - S3
-router.post('/imgUpload', uploadImg.single('image'), (req, res) => {
+router.post('/imgUpload', uploadImg_profile.single('image'), (req, res) => {
     try {
         if (!req.file) {
             response(res, 400, "이미지가 첨부되지 않았습니다.");

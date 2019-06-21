@@ -49,27 +49,16 @@ router.get('/:company_id/show', verifyToken, async (req, res, next) => {
         if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
         // params값 체크
         if (!company_id) { response(res, 400, "params값 없음"); return; }
-
         // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) {
-            response(res, 404, "사용자가 존재하지 않습니다.");
-            return;
-        }
+        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
 
-        const user = await User.findOne({ 
-            where: { id: req.decoded.user_id }, 
-            include: [{ model: UserAuth }], 
-        });
-
+        const user = await User.findOne({ where: { id: req.decoded.user_id }, include: [{ model: UserAuth }], });
         // 중복 로그인 체크
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
-            response(res, 400, "중복 로그인"); 
-            return;
-        }
-
+        if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
+        // 업체 존재여부 체크
         const company = await Company.findOne({ where: { id: company_id } });
         if (!company) { response(res, 404, "업체가 존재하지 않습니다."); return; }
-
+        // 권한 체크
         if (company.user_id == user.id) {
             const safeManageFee = await SafeManageFee.findOne({ where: { company_id } });
             let payLoad = { company, safeManageFee };
@@ -86,21 +75,12 @@ router.get('/:company_id/show', verifyToken, async (req, res, next) => {
 // 업체 등록
 router.post('/create', verifyToken, async (req, res, next) => {
     try {
-        const { 
-            // 업체 정보
-            name, key, mobile, tel, fax, email, memo,
-            // 주소 정보
-            jibunAddr, roadFullAddr, roadAddrPart1, roadAddrPart2, engAddr, 
-            zipNo, siNm, sggNm, emdNm, liNm, rn, lnbrMnnm, lnbrSlno, detail,
-            // 안전관리 수수료
-            businessType, voltType, passiveKw, generateKw, sunKw, 
-            sum, fee, weight, checking,         
-        } = req.body; 
+        const { newCompany } = req.body; 
 
         // 로그인 체크
         if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
         // 입력값 체크
-        if (!name || !key || !businessType || !voltType ) { response(res, 400, "값을 입력해 주세요."); return; }
+        if (!newCompany || (!newCompany.info || (newCompany.info == [])) ) { response(res, 400, "값을 입력해 주세요."); return; }
         // 유저 존재여부 체크
         if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
         const user = await User.findOne({ where: { id: req.decoded.user_id }, include: [{ model: UserAuth }], });
@@ -110,19 +90,29 @@ router.post('/create', verifyToken, async (req, res, next) => {
         if (!(await compAuth(user))) { response(res, 401, "권한 없음"); return; }
 
         // 업체 생성
-        let company = await Company.create({ name, key, mobile, tel, fax, email, memo });
+        let company = await Company.create({ 
+            name: newCompany.info.name, key: newCompany.info.key, mobile: newCompany.info.mobile, 
+            tel: newCompany.info.tel, fax: newCompany.info.fax, email: newCompany.info.email, 
+            memo: newCompany.info.memo, 
+        });
         await user.addCompany(company);
         // SafeManageFee 생성 - Company와 1:1 관계
+        let smf = newCompany.safeManageFee
         const safeManageFee = await SafeManageFee.create({
-            businessType, voltType, passiveKw, generateKw, sunKw, 
-            sum, fee, weight, checking
+            businessType: smf.businessType, voltType: smf.voltType, 
+            passiveKw: smf.passiveKw, generateKw: smf.generateKw, sunKw: smf.sunKw, 
+            sum: smf.sum, fee: smf.fee, weight: smf.weight, checking: smf.checking,
         })
         await company.setSafeManageFee(safeManageFee); // 1:1 관계 시 set 사용
 
         // 주소 생성
+        let addr = newCompany.address
         const address = await Address.create({ 
-            jibunAddr, roadFullAddr, roadAddrPart1, roadAddrPart2, engAddr, 
-            zipNo, siNm, sggNm, emdNm, liNm, rn, lnbrMnnm, lnbrSlno, detail,
+            jibunAddr: addr.jibunAddr, 
+            roadFullAddr: addr.roadFullAddr, roadAddrPart1: addr.roadAddrPart1, roadAddrPart2: addr.roadAddrPart2, 
+            engAddr: addr.engAddr, zipNo: addr.zipNo, siNm: addr.siNm, sggNm: addr.sggNm, 
+            emdNm: addr.emdNm, liNm: addr.liNm, rn: addr.rn, 
+            lnbrMnnm: addr.lnbrMnnm, lnbrSlno: addr.lnbrSlno, detail: addr.detail,
         })
         await company.setAddress(address);
 
@@ -133,7 +123,14 @@ router.post('/create', verifyToken, async (req, res, next) => {
             { where: { user_id: user.id } },
         );    
 
-        let payLoad = { company, safeManageFee, address };
+        let resCompany = await Company.findOne({ 
+            where: { id: company.id },
+            include: [
+                { model: Address },
+                { model: SafeManageFee }
+            ]
+         })
+        let payLoad = { company: resCompany };
         response(res, 201, "등록을 완료하였습니다.", payLoad); 
     } catch (err) {
         console.log(err);
@@ -168,15 +165,19 @@ router.get('/:company_id/edit', verifyToken, async (req, res, next) => {
         // 업체 존재여부 체크
         const company = await Company.findOne({ where: { id: company_id }});
         if (!company) { response(res, 404, "업체가 존재하지 않습니다."); return; }
+        if (company.user_id != user.id) { response(res, 401, "서버 에러"); return; }
+        
+        let resCompany = await Company.findOne({ 
+            where: { id: company_id },
+            include: [
+                { model: Address },
+                { model: SafeManageFee }
+            ]
+         });
+        let payLoad = { company: resCompany };
 
-        if (company.user_id == user.id) {
-            const safeManageFee = await SafeManageFee.findOne({ where: { company_id: company.id } });
-            let payLoad = { company, safeManageFee };
-
-            response(res, 200, "업체 수정 페이지", payLoad);
-        } else {
-            response(res, 401, '권한 없음');
-        }
+        response(res, 200, "업체 수정 페이지", payLoad);
+      
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");
@@ -186,75 +187,67 @@ router.get('/:company_id/edit', verifyToken, async (req, res, next) => {
 // 업체 편집 
 router.put('/:company_id/edit', verifyToken, async (req, res, next) => {
     try {
-        const { 
-            // 업체 정보
-            name, key, mobile, tel, fax, email, memo,
-            // 주소 정보
-            jibunAddr, roadFullAddr, roadAddrPart1, roadAddrPart2, engAddr, 
-            zipNo, siNm, sggNm, emdNm, liNm, rn, lnbrMnnm, lnbrSlno, detail,
-
-            // 안전관리 수수료
-            businessType, voltType, passiveKw, generateKw, sunKw, 
-            sum, fee, weight, checking 
-        } = req.body; 
+        const { reCompany } = req.body; 
         const { company_id } = req.params;
 
         // 로그인 체크
         if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
-
         // 입력값 존재여부 체크
-        if (!name || !key || !businessType || !voltType ) { 
-            response(res, 400, "입력값 없음"); 
-            return; 
-        }
+        if (!reCompany) { response(res, 400, "입력값 없음"); return; }
         // params값 체크
         if (!company_id) { response(res, 400, "params값 없음"); return; }
-
         // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) {
-            response(res, 404, "사용자가 존재하지 않습니다.");
-            return;
-        }
+        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
 
-        const user = await User.findOne({ where: { id: req.decoded.user_id } });
-        
+        const user = await User.findOne({ where: { id: req.decoded.user_id } });   
         // 중복 로그인 체크
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
-            response(res, 400, "중복 로그인"); 
-            return;
-        }
-
+        if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
         // 업체 존재여부 체크
         let company = await Company.findOne({ where: { id: company_id }});
         if (!company) { response(res, 404, "업체가 존재 하지 않습니다."); return; }
-
         // 권한 체크
-        if (company.user_id == user.id) {
-            // 업체정보 업데이트
-            await Company.update(
-                { name, key, mobile, tel, fax, email, memo },
-                { where: { id: company.id} }
-            );
-            company = await Company.findOne({ where: { id: company_id }});
+        if (company.user_id != user.id) { response(res, 401, "권한 없음"); return; }
+        
+        let info = reCompany.info;
+        // 업체정보 업데이트
+        await Company.update(
+            { name: info.name, key: info.key, mobile: info.mobile, tel:info.tel, fax: info.fax, email: info.email, memo: info.memo },
+            { where: { id: company.id} }
+        );
+        company = await Company.findOne({ where: { id: company_id }});
 
-            await SafeManageFee.update(
-                { businessType, voltType, passiveKw, generateKw, sunKw, sum, fee, weight, checking },
-                { where: { company_id } }
-            );
+        let smf = reCompany.safeManageFee
+        await SafeManageFee.update(
+            { 
+                businessType: smf.businessType, voltType: smf.voltType, 
+                passiveKw: smf.passiveKw, generateKw: smf.generateKw, sunKw: smf.sunKw, 
+                sum: smf.sum, fee: smf.fee, weight: smf.weight, checking: smf.checking, 
+            },
+            { where: { company_id } }
+        );
 
-            // 주소 업데이트
-            await Address.update({ 
-                    jibunAddr, roadFullAddr, roadAddrPart1, roadAddrPart2, engAddr, 
-                    zipNo, siNm, sggNm, emdNm, liNm, rn, lnbrMnnm, lnbrSlno, detail
-                }, { where: { company_id: company.id} });
-            const safeManageFee = await SafeManageFee.findOne({ where: { company_id } });
-            const address = await Address.findOne({ where: { company_id: company.id } });
-
-            let payLoad = { company, address, safeManageFee };
-            response(res, 200, "수정을 완료하였습니다.", payLoad);
-        } else {
-            response(res, 401, '권한 없음');
-        }
+        let addr = reCompany.address
+        // 주소 업데이트
+        await Address.update(
+            { 
+                jibunAddr: addr.jibunAddr, 
+                roadFullAddr: addr.roadFullAddr, roadAddrPart1: addr.roadAddrPart1, roadAddrPart2: addr.roadAddrPart2, 
+                engAddr: addr.engAddr, 
+                zipNo: addr.zipNo, siNm: addr.siNm, sggNm: addr.sggNm, emdNm: addr.emdNm, 
+                liNm: addr.liNm, rn: addr.rn, lnbrMnnm: addr.lnbrMnnm, lnbrSlno: addr.lnbrSlno, detail: addr.detail,
+            }, 
+            { where: { company_id } }
+        );
+        let resCompany = await Company.findOne({ 
+            where: { id: company_id },
+            include: [
+                { model: Address },
+                { model: SafeManageFee }
+            ]
+         });
+        let payLoad = { company: resCompany };
+        response(res, 200, "수정을 완료하였습니다.", payLoad);
+    
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");

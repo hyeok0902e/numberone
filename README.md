@@ -152,6 +152,12 @@
 #### router
 - billProject/condenser
 
+### 2019.06.21(금)
+#### router
+- billProject 1차 완료 - Front와 핑퐁 필요
+- company/rayPaper - 수정, 수정페이지, 상세보기, 목록, 생성, 복사
+- company/testPaper - 목록, 생성
+
 ## 해결해야 할 오류 & 이슈
 - [해결완료] routes/product/product.js => create에서 product의 productOpt와 productThumb값을 받아오지 못함.
 ### 일반부하(분전반) 생성 및 집계시 (06.02)

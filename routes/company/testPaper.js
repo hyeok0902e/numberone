@@ -1,4 +1,5 @@
 const express = require('express');
+const moment = require("moment");
 
 // 모델 import
 const { User, UserAuth, Company, TestPaper } = require('../../models'); 
@@ -12,7 +13,6 @@ const { uploadImg } = require('../middlewares/uploadImg');
 // /company/testPaper
 const router = express.Router();
 
-
 // 기록표 목록
 router.get('/', verifyToken, async (req, res, next) => {
     try {
@@ -22,28 +22,21 @@ router.get('/', verifyToken, async (req, res, next) => {
         // 데이터 체크
         if (!company_id) { response(res, 400, "데이터 없음"); return; }
         // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
-            
+        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }    
         // 중복 로그인 체크
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
         if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
-        // 업체 존재여부 체크
+
         const company = await Company.findOne({ where: { id: company_id} });
-        if (!company) { response(res, 404, "업체가 존재하지 않습니다."); return; }
-
         // 권한 체크
-        if (company.user_id == user.id) {
-            // 목록 불러오기
-            const testPapers = await TestPaper.findAll({ where: { company_id: company.id } });          
-            // 목록이 없을 때
-            if (testPapers.length == 0) { response(res, 404, "목록이 존재하지 않습니다."); return; }
+        if (company.user_id != user.id) { response(res, 401, "권한 없음"); return; }
+        // 목록 불러오기
+        const testPapers = await TestPaper.findAll({ where: { company_id: company.id }, attributes: ['checkDate'], });          
+        // 목록이 없을 때
+        if (testPapers.length == 0) { response(res, 404, "목록이 존재하지 않습니다."); return; }
 
-            let payLoad = { testPapers };
-            response(res, 200, "전기설비 점검결과 기록표 목록", payLoad);
-        } else {
-            response(res, '401', "권한 없음");
-        }
-
+        let payLoad = { testPapers };
+        response(res, 200, "전기설비 점검결과 기록표 목록", payLoad);
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");
@@ -64,6 +57,9 @@ router.post('/:testPaper_id/copy', verifyToken, async (req, res, next) => {
         // 중복 로그인 체크
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
         if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
+        // 기록표 존재여부 체크
+        let testPaper = await TestPaper.findOne({ where: { id: testPaper_id } });
+        if (!testPaper) { response(res, 404, "기록표가 존재하지 않습니다."); return; }
         // 업체 존재여부 체크
         let company = await Company.findOne({ where: { id: testPaper.company_id } });
         if (!company) { response(res, 404, "업체가 존재하지 않습니다."); return; }
@@ -74,7 +70,7 @@ router.post('/:testPaper_id/copy', verifyToken, async (req, res, next) => {
                 await delete data.id // id값 제거
                 const copy = await TestPaper.create(data); // 데이터 복사
                 await company.addTestPaper(copy);
-                let payLoad = { copy };
+                let payLoad = { testPaper: copy };
                 response(res, 201, "기록표가 복사되었습니다.", payLoad);
             })
             .catch(err => { 
@@ -97,14 +93,8 @@ router.post('/create', verifyToken, async (req, res, next) => {
         // 데이터 체크
         if (!company_id) { response(res, 400, "데이터 없음"); return; }
         if (!testPaper) { response(res, 400, "데이터 없음"); return; }
-        // 입력값 체크
-        if (!compName) { response(res, 400, "값을 입력해 주세요."); return; }
-
         // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) {
-            response(res, 404, "사용자가 존재하지 않습니다.");
-            return;
-        }
+        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
 
         // passiveVolt, generateVolt, generateKw, sunKw, contractKw,
         // checkType, checking, 
@@ -125,21 +115,16 @@ router.post('/create', verifyToken, async (req, res, next) => {
         // c3Volt, c3Ampe, c3Temp, n3Volt, n3Ampe, n3Temp,
 
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
-        
         // 중복 로그인 체크
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
-            response(res, 400, "중복 로그인"); 
-            return;
-        }
-
+        if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
         // 업체 존재여부 체크
         const company = await Company.findOne({ where: { id: company_id } });
         if (!company) { response(res, 404, "업체가 존재하지 않습니다."); return; }
 
         // 권한 체크
         if (company.user_id == user.id) {
-            let testPaper = await TestPaper.create({
-                compName: testPaper.compName, checkDate: moment(Date.now()).format('YYYY-MM-DD'), 
+            let reTestPaper = await TestPaper.create({
+                compName: company.name, checkDate: moment(Date.now()).format('YYYY-MM-DD'), 
                 passiveVolt: testPaper.passiveVolt, generateVolt: testPaper.generateVolt, generateKw: testPaper.generateKw, 
                 sunKw: testPaper.sunKw, contractKw: testPaper.contractKw,
                 checkType: testPaper.checkType, checking: testPaper.checking, 
@@ -161,9 +146,9 @@ router.post('/create', verifyToken, async (req, res, next) => {
                 
                 // 서명
                 checkerName: testPaper.checkerName,
-                checkerSign,
+                checkerSign: testPaper.checkerSign,
                 managerName: user.name,
-                managerSign,
+                managerSign: testPaper.managerSign,
                 // 회사명
                 userCompName: user.company, 
                 // 대표 번호
@@ -171,12 +156,9 @@ router.post('/create', verifyToken, async (req, res, next) => {
                 // 팩스
                 userCompFax: user.fax,
             });
-            await company.addTestPaper(testPaper);
+            await company.addTestPaper(reTestPaper);
 
-            // 저장된 기록표 다시 한 번 불러오기
-            testPaper = await TestPaper.findOne({ where: { id: testPaper.id } });
-            let payLoad = { testPaper };
-
+            let payLoad = { testPaper: reTestPaper };
             response(res, 201, "등록을 완료하였습니다.", payLoad);
         } else {
             response(res, 401, "권한 없음");
