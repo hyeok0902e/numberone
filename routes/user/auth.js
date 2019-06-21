@@ -188,7 +188,7 @@ router.post('/signIn', async (req, res, next) => {
                 email: user.email,
                 uuid: uuidNew,
             }, process.env.JWT_SECRET,{
-                expiresIn: '60m', // 나중에 30m으로 변경
+                expiresIn: '10h', // 나중에 30m으로 변경
                 issuer: 'tlcompany',
             });
                
