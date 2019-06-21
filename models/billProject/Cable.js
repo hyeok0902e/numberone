@@ -52,7 +52,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         cableThick: { // 케이블 - 굵기 (㎟)
-            type: DataTypes.DOUBLE(11, 2),
+            type: DataTypes.STRING(45),
             allowNull: true,
             defaultValue: 0,
         },
@@ -72,7 +72,7 @@ module.exports = (sequelize, DataTypes) => (
             defaultValue: 0,
         },
         userThick: { // 사용자 선정 - 굵기 (㎟)
-            type: DataTypes.DOUBLE(11, 2),
+            type: DataTypes.STRING(45),
             allowNull: true,
             defaultValue: 0,
         },

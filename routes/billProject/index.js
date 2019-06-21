@@ -74,7 +74,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
             { where: { user_id: user.id } },
         );        
         
-        let payLoad = { billProejct_id: billProject.id, name: billProject.name, voltType: billProject.voltType };
+        let payLoad = { billProject };
         response(res, 201, '계산서 프로젝트가 생성되었습니다.', payLoad);
     } catch (err) {
         console.log(err);

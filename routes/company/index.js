@@ -15,23 +15,12 @@ router.get('/', verifyToken, async (req, res, next) => {
     try {
         // 로그인 체크
         if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
-
         // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) {
-            response(res, 404, "사용자가 존재하지 않습니다.");
-            return;
-        }
+        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
 
-        const user = await User.findOne({ 
-            where: { id: req.decoded.user_id }, 
-            include: [{ model: UserAuth }], 
-        });
-
+        const user = await User.findOne({ where: { id: req.decoded.user_id }, include: [{ model: UserAuth }], });
         // 중복 로그인 체크
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
-            response(res, 400, "중복 로그인"); 
-            return;
-        }
+        if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
 
         // 업체 목록 가져오기
         const companies = await Company.findAll({
@@ -40,14 +29,11 @@ router.get('/', verifyToken, async (req, res, next) => {
             // 기획서상 업체목록에서 용량 => 수전, 발전, 태양광 용량의 합 => Front에서 처리
             include: [{ model: SafeManageFee, attributes: ['passiveKw', 'generatekw', 'sunKw'] }],
         });
-
         // 업체목록 존재여부 체크
         if (!companies) { response(res, 404, "목록이 존재하지 않습니다."); return; }
-        
+
         let payLoad = { companies };
         response(res, 200, "업체 목록", payLoad);
-
-
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");
@@ -106,7 +92,6 @@ router.post('/create', verifyToken, async (req, res, next) => {
             // 주소 정보
             jibunAddr, roadFullAddr, roadAddrPart1, roadAddrPart2, engAddr, 
             zipNo, siNm, sggNm, emdNm, liNm, rn, lnbrMnnm, lnbrSlno, detail,
-
             // 안전관리 수수료
             businessType, voltType, passiveKw, generateKw, sunKw, 
             sum, fee, weight, checking,         
@@ -118,7 +103,6 @@ router.post('/create', verifyToken, async (req, res, next) => {
         if (!name || !key || !businessType || !voltType ) { response(res, 400, "값을 입력해 주세요."); return; }
         // 유저 존재여부 체크
         if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
-
         const user = await User.findOne({ where: { id: req.decoded.user_id }, include: [{ model: UserAuth }], });
         // 중복 로그인 체크
         if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
@@ -128,7 +112,6 @@ router.post('/create', verifyToken, async (req, res, next) => {
         // 업체 생성
         let company = await Company.create({ name, key, mobile, tel, fax, email, memo });
         await user.addCompany(company);
-
         // SafeManageFee 생성 - Company와 1:1 관계
         const safeManageFee = await SafeManageFee.create({
             businessType, voltType, passiveKw, generateKw, sunKw, 

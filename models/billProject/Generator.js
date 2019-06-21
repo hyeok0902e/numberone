@@ -16,9 +16,8 @@ module.exports = (sequelize, DataTypes) => (
             defaultValue: 0,
         },
         taskWay: { // 기동방식 
-            type: DataTypes.DOUBLE(11, 2),
+            type: DataTypes.STRING(45),
             allowNull: true,
-            defaultValue: 0,
         },
         taskKva: { // 기동 Kva (B)
             type: DataTypes.DOUBLE(11, 2),

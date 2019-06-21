@@ -11,87 +11,87 @@ db.Sequelize = Sequelize;
 
 /******************************** Initialize (Start) ********************************/
 // 공통 및 기타
-db.Address = require('./Address')(sequelize, Sequelize);
-db.Announcement = require('./Announcement')(sequelize, Sequelize);
+db.Address = require('./address')(sequelize, Sequelize);
+db.Announcement = require('./announcement')(sequelize, Sequelize);
 
 // User
-db.User = require('./user/User')(sequelize, Sequelize);
-db.Attendance = require('./user/Attendance')(sequelize, Sequelize);
-db.UserPick = require('./user/UserPick')(sequelize, Sequelize);
-db.UserAuth = require('./user/UserAuth')(sequelize, Sequelize);
+db.User = require('./user/user')(sequelize, Sequelize);
+db.Attendance = require('./user/attendance')(sequelize, Sequelize);
+db.UserPick = require('./user/userpick')(sequelize, Sequelize);
+db.UserAuth = require('./user/userauth')(sequelize, Sequelize);
 
 // BillProject
-db.BillProject = require('./billProject/BillProject')(sequelize, Sequelize);
+db.BillProject = require('./billProject/billProject')(sequelize, Sequelize);
 db.Load = require('./billProject/Load')(sequelize, Sequelize);
-db.Transformer = require('./billProject/Transformer')(sequelize, Sequelize);
-db.ContractElectricity = require('./billProject/ContractElectricity')(sequelize, Sequelize);
-db.PE_Low = require('./billProject/PE_Low')(sequelize, Sequelize);
-db.MainPE_High = require('./billProject/MainPE_High')(sequelize, Sequelize);
-db.BankPE_High = require('./billProject/BankPE_High')(sequelize, Sequelize);
-db.Condenser = require('./billProject/Condenser')(sequelize, Sequelize);
-db.Breaker = require('./billProject/Breaker')(sequelize, Sequelize);
-db.Cable = require('./billProject/Cable')(sequelize, Sequelize);
-db.WireCase = require('./billProject/WireCase')(sequelize, Sequelize);
-db.Tray = require('./billProject/Tray')(sequelize, Sequelize);
-db.Generator = require('./billProject/Generator')(sequelize, Sequelize);
+db.Transformer = require('./billProject/transformer')(sequelize, Sequelize);
+db.ContractElectricity = require('./billProject/contractElectricity')(sequelize, Sequelize);
+db.PE_Low = require('./billProject/peLow')(sequelize, Sequelize);
+db.MainPE_High = require('./billProject/mainPeHigh')(sequelize, Sequelize);
+db.BankPE_High = require('./billProject/bankPeHigh')(sequelize, Sequelize);
+db.Condenser = require('./billProject/condenser')(sequelize, Sequelize);
+db.Breaker = require('./billProject/breaker')(sequelize, Sequelize);
+db.Cable = require('./billProject/cable')(sequelize, Sequelize);
+db.WireCase = require('./billProject/wireCase')(sequelize, Sequelize);
+db.Tray = require('./billProject/tray')(sequelize, Sequelize);
+db.Generator = require('./billProject/generator')(sequelize, Sequelize);
 
 // Company
-db.Company = require('./company/Company')(sequelize, Sequelize);
-db.SafeManageFee = require('./company/SafeManageFee')(sequelize, Sequelize);
-db.TestPaper = require('./company/TestPaper')(sequelize, Sequelize);
-db.RayPaper = require('./company/RayPaper')(sequelize, Sequelize);
-db.PowerPaper = require('./company/PowerPaper')(sequelize, Sequelize);
-db.PowerPaperElement = require('./company/PowerPaperElement')(sequelize, Sequelize);
-db.EstimatePaper = require('./company/EstimatePaper')(sequelize, Sequelize);
-db.EstimatePaperElement = require('./company/EstimatePaperElement')(sequelize, Sequelize);
-db.OpeningPaper = require('./company/OpeningPaper')(sequelize, Sequelize);
+db.Company = require('./company/company')(sequelize, Sequelize);
+db.SafeManageFee = require('./company/safeManageFee')(sequelize, Sequelize);
+db.TestPaper = require('./company/testPaper')(sequelize, Sequelize);
+db.RayPaper = require('./company/rayPaper')(sequelize, Sequelize);
+db.PowerPaper = require('./company/powerPaper')(sequelize, Sequelize);
+db.PowerPaperElement = require('./company/powerPaperElement')(sequelize, Sequelize);
+db.EstimatePaper = require('./company/estimatePaper')(sequelize, Sequelize);
+db.EstimatePaperElement = require('./company/estimatePaperElement')(sequelize, Sequelize);
+db.OpeningPaper = require('./company/openingPaper')(sequelize, Sequelize);
 
 // FeeProject
-db.FeeProject = require('./feeProject/FeeProject')(sequelize, Sequelize);
-db.KepcoFee = require('./feeProject/KepcoFee')(sequelize, Sequelize);
-db.PreUsage = require('./feeProject/PreUsage')(sequelize, Sequelize);
-db.PreReceptFee = require('./feeProject/PreUsage')(sequelize, Sequelize);
-db.PrePowerFee = require('./feeProject/PrePowerFee')(sequelize, Sequelize);
-db.PreWireFee = require('./feeProject/PreWireFee')(sequelize, Sequelize);
-db.PeriodUsage = require('./feeProject/PeriodUsage')(sequelize, Sequelize);
-db.PeriodReceptFee = require('./feeProject/PeriodReceptFee')(sequelize, Sequelize);
-db.PeriodPowerFee = require('./feeProject/PeriodPowerFee')(sequelize, Sequelize);
-db.PeriodWireFee = require('./feeProject/PeriodWireFee')(sequelize, Sequelize);
-db.PreChange = require('./feeProject/PreChange')(sequelize, Sequelize);
-db.PreChangeFee = require('./feeProject/PreChangeFee')(sequelize, Sequelize);
-db.SafeManage = require('./feeProject/SafeManage')(sequelize, Sequelize);
+db.FeeProject = require('./feeProject/feeProject')(sequelize, Sequelize);
+db.KepcoFee = require('./feeProject/kepcoFee')(sequelize, Sequelize);
+db.PreUsage = require('./feeProject/preUsage')(sequelize, Sequelize);
+db.PreReceptFee = require('./feeProject/preUsage')(sequelize, Sequelize);
+db.PrePowerFee = require('./feeProject/prePowerFee')(sequelize, Sequelize);
+db.PreWireFee = require('./feeProject/preWireFee')(sequelize, Sequelize);
+db.PeriodUsage = require('./feeProject/periodUsage')(sequelize, Sequelize);
+db.PeriodReceptFee = require('./feeProject/periodReceptFee')(sequelize, Sequelize);
+db.PeriodPowerFee = require('./feeProject/periodPowerFee')(sequelize, Sequelize);
+db.PeriodWireFee = require('./feeProject/periodWireFee')(sequelize, Sequelize);
+db.PreChange = require('./feeProject/preChange')(sequelize, Sequelize);
+db.PreChangeFee = require('./feeProject/preChangeFee')(sequelize, Sequelize);
+db.SafeManage = require('./feeProject/safeManage')(sequelize, Sequelize);
 
 // Statement 
-db.Statement = require('./statement/Statement')(sequelize, Sequelize);
-db.Process = require('./statement/Process')(sequelize, Sequelize);
-db.ProcessDetail = require('./statement/ProcessDetail')(sequelize, Sequelize);
-db.ProcessDetailElement = require('./statement/ProcessDetailElement')(sequelize, Sequelize);
+db.Statement = require('./statement/statement')(sequelize, Sequelize);
+db.Process = require('./statement/process')(sequelize, Sequelize);
+db.ProcessDetail = require('./statement/processDetail')(sequelize, Sequelize);
+db.ProcessDetailElement = require('./statement/processDetailElement')(sequelize, Sequelize);
 
 // JobSearch
-db.Hiring = require('./jobSearch/Hiring')(sequelize, Sequelize);
-db.Seeking = require('./jobSearch/Seeking')(sequelize, Sequelize);
-db.Labor = require('./jobSearch/Labor')(sequelize, Sequelize);
+db.Hiring = require('./jobSearch/hiring')(sequelize, Sequelize);
+db.Seeking = require('./jobSearch/seeking')(sequelize, Sequelize);
+db.Labor = require('./jobSearch/labor')(sequelize, Sequelize);
 
 // Organization
-db.Organization = require('./organization/Organization')(sequelize, Sequelize);
+db.Organization = require('./organization/organization')(sequelize, Sequelize);
 
 // Material
-db.Material = require('./material/Material')(sequelize, Sequelize);
+db.Material = require('./material/material')(sequelize, Sequelize);
 
 // Product
-db.Product = require('./product/Product')(sequelize, Sequelize);
-db.ProductOpt = require('./product/ProductOpt')(sequelize, Sequelize);
-db.ProductThumb = require('./product/ProductThumb')(sequelize, Sequelize);
-db.BucketProduct = require('./product/BucketProduct')(sequelize, Sequelize);
-db.BucketProductOpt = require('./product/BucketProduct')(sequelize, Sequelize);
-db.EstimateOfBucket = require('./product/EstimateOfBucket')(sequelize, Sequelize);
+db.Product = require('./product/product')(sequelize, Sequelize);
+db.ProductOpt = require('./product/productOpt')(sequelize, Sequelize);
+db.ProductThumb = require('./product/productThumb')(sequelize, Sequelize);
+db.BucketProduct = require('./product/bucketProduct')(sequelize, Sequelize);
+db.BucketProductOpt = require('./product/bucketProduct')(sequelize, Sequelize);
+db.EstimateOfBucket = require('./product/estimateOfBucket')(sequelize, Sequelize);
 
 // Document
-db.Document = require('./document/Document')(sequelize, Sequelize);
+db.Document = require('./document/document')(sequelize, Sequelize);
 
 // MarketPrice
-db.MarketPrice = require('./marketPrice/MarketPrice')(sequelize, Sequelize);
-db.MarketPriceOpt = require('./marketPrice/MarketPriceOpt')(sequelize, Sequelize);
+db.MarketPrice = require('./marketPrice/marketPrice')(sequelize, Sequelize);
+db.MarketPriceOpt = require('./marketPrice/marketPriceOpt')(sequelize, Sequelize);
 /********************************* Initialize (End) *********************************/
 
 
@@ -180,6 +180,8 @@ db.Load.hasOne(db.Tray, { foreignKey: 'load_id', sourceKey: 'id' });
 // Generator
 db.Generator.belongsTo(db.Load, { foreignKey: 'load_id', targetKey: 'id' });
 db.Load.hasOne(db.Generator, { foreignKey: 'load_id', sourceKey: 'id' });
+db.Generator.belongsTo(db.BillProject, { foreignKey: 'billProject_id', targetKey: 'id' })
+db.BillProject.hasMany(db.Generator, { foreignKey: 'billProject_id', sourceKey: 'id' });
 /************************* Relation About BillProject (End) *************************/
 
 

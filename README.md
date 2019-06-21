@@ -148,6 +148,9 @@
 #### router
 - billProject/pe.js => high/create, low/create
 
+### 2019.06.12(수)
+#### router
+- billProject/condenser
 
 ## 해결해야 할 오류 & 이슈
 - [해결완료] routes/product/product.js => create에서 product의 productOpt와 productThumb값을 받아오지 못함.

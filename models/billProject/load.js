@@ -4,6 +4,10 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.INTEGER(2),
             allowNull: false,
         },
+        thisType: {
+            type: DataTypes.INTEGER(2),
+            allowNull: true,
+        },
         name: { // 부하명
             type: DataTypes.STRING(45),
             allowNull: false,            

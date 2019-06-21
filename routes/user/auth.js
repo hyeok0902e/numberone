@@ -4,10 +4,10 @@ const jwt = require('jsonwebtoken');
 const uuidv4 = require('uuid/v4');
 
 // 모델 import
-const { User, UserPick, UserAuth } = require('../../models'); // address 추가 필요
+const { User, UserPick, UserAuth, Address } = require('../../models'); // address 추가 필요
 
 // 커스텀 미들웨어
-const { exUser, verifyToken, verifyUid } = require('../middlewares/main');
+const { exUser, verifyToken, verifyUid, asyncForEach } = require('../middlewares/main');
 const { response } = require('../middlewares/response');
 const { uploadImg } = require('../middlewares/uploadImg');
 
@@ -77,81 +77,67 @@ router.post('/token', async (req, res, next) => {
 
 // 회원가입
 router.post('/signUp', async (req, res, next) => {
-    const { 
-        /* 사용자 정보 */
-        email, password, password2, // 이메일, 비밀번호
-        fbUID, fbFCM, // Firebase UID & FCM Token
-        name, birth, gender, phone, task, // 이름, 생일, 성, 휴대폰, 직종
-        company, companyTel, fax, profile, // 회사명, 회사번호, 팩스, 프로필사진
-        level, productAuth, marketAuth, // 회원등급, 제품등록 권한, 시세정보등록 권한 
-        userPicks, 
+    // /* 사용자 정보 */
+    // email, password, password2, // 이메일, 비밀번호
+    // fbUID, fbFCM, // Firebase UID & FCM Token
+    // name, birth, gender, phone, task, // 이름, 생일, 성, 휴대폰, 직종
+    // company, companyTel, fax, profile, // 회사명, 회사번호, 팩스, 프로필사진
+    // level, productAuth, marketAuth, // 회원등급, 제품등록 권한, 시세정보등록 권한 
+    // userPicks, 
 
-        /* 사용자 주소 정보 */
-        jibunAddr, roadFullAddr, roadAddrPart1, roadAddrPart2,
-        engAddr, zipNo, siNm, sggNm, emdNm, liNm, rn, lnbrMnnm, lnbrSlno, detail,
-    } = req.body;
+    // /* 사용자 주소 정보 */
+    // jibunAddr, roadFullAddr, roadAddrPart1, roadAddrPart2,
+    // engAddr, zipNo, siNm, sggNm, emdNm, liNm, rn, lnbrMnnm, lnbrSlno, detail,
+    const { newUser } = req.body;
 
     try {
-        if (email && password && password2 && name && birth && gender 
-            && phone && task && company && companyTel 
-            && level && productAuth && marketAuth) { // 반드시 입력받아야 하는 값들
-            
-            if (password != password2) {
-                response(res, 400, "비밀번호가 일치하지 않습니다.");
-                return;
-            }
+        // 데이터 체크
+        if (!newUser) { response(res, 400, "서버 에러"); return; }
+        // 비밀번호 체크
+        if (newUser.info.password != newUser.info.password2) { response(res, 400, "비밀번호가 일치하지 않습니다."); return; }
+        // 이메일 중복체크
+        const exUser = await User.findOne({ where: { email: newUser.info.email } });
+        if (exUser) { response(res, "400", "중복된 이메일 입니다."); return; }
+        // 관심목록 입력 여부 체크
+        if ((!newUser.info.userPicks) || (newUser.info.userPicks == [])) { response(res, 400, '관심품목을 선택해 주세요.'); return; } 
 
-            // 이메일 중복체크
-            const exUser = await User.findOne({ where: { email: email } });
-            console.log(exUser)
-            if (exUser) { response(res, "400", "중복된 이메일 입니다."); return; }
+        // 주소 데이터 체크
+        if (!newUser.address) { response(res, 400, "주소를 입력해 주세요."); return; }
+        // 비밀번호 암호화
+        const hash = await bcrypt.hash(newUser.info.password, 12); 
+        // User 생성
+        const user = await User.create({
+            email: newUser.info.email, password: hash, // 이메일, 비밀번호
+            fbUID: newUser.info.fbUID, fbFCM: newUser.info.fbFCM, // Firebase UID & FCM Token
+            // 이름, 생일, 성, 휴대폰, 직종 / birth는 수정 필요
+            name: newUser.info.name, birth: Date.now(), gender: newUser.info.gender, phone: newUser.info.phone, task: newUser.info.task, 
+            // 회사명, 회사번호, 팩스, 프로필사진
+            company: newUser.info.company, companyTel: newUser.info.companyTel, fax: newUser.info.fax, profile: newUser.info.profile, 
+            // 회원등급, 제품등록 권한, 시세정보등록 권한
+            // level, productAuth, marketAuth  
+        }); 
+        // UserPick 생성
+        await asyncForEach(newUser.info.userPicks, async (up) => {
+            let userPick = await UserPick.create({ name: up });
+            await user.addUserPick(userPick);
+        });
+        // 권한 생성
+        const userAuth = await UserAuth.create({ period: 0 });
+        await user.setUserAuth(userAuth); // hasOne
 
-            // 관심목록 입력 여부 체크
-            if ((!userPicks) || (userPicks == [])) {
-                response(res, 400, '관심품목을 선택해 주세요.');
-                return;
-            } 
+        // 주소 생성 코드 작성 필요!
+        const address = await Address.create({ 
+            jibunAddr: newUser.address.jibunAddr, roadFullAddr: newUser.address.roadFullAddr, 
+            roadAddrPart1: newUser.address.roadAddrPart1, roadAddrPart2: newUser.address.roadAddrPart2,
+            engAddr: newUser.address.engAddr, zipNo: newUser.address.zipNo, 
+            siNm: newUser.address.siNm, sggNm: newUser.address.sggNm, 
+            emdNm: newUser.address.emdNm, liNm: newUser.address.liNm, rn: newUser.address.rn,
+            lnbrMnnm: newUser.address.lnbrMnnm, lnbrSlno: newUser.address.lnbrSlno, 
+            detail: newUser.address.detail
+        });
+        await user.setAddress(address)
 
-            // 주소를 입력하지 않았을 때 response 작성 필요!
-            // if (!jibunAddr || !roadFullAddr) {
-            //     response(res, 400, "주소를 입력해 주세요.");
-            //     return
-            // }
-
-            // 비밀번호 암호화
-            const hash = await bcrypt.hash(password, 12); 
-            
-            // User 생성
-            const user = await User.create({
-                email, password: hash, // 이메일, 비밀번호
-                fbUID, fbFCM, // Firebase UID & FCM Token
-                name, birth: Date.now(), gender, phone, task, // 이름, 생일, 성, 휴대폰, 직종
-                company, companyTel, fax, profile, // 회사명, 회사번호, 팩스, 프로필사진
-                level, productAuth, marketAuth // 회원등급, 제품등록 권한, 시세정보등록 권한 
-            }); 
-
-            // UserPick 생성
-            userPicks.forEach(async (up) => {
-                let userPick = await UserPick.create({ name: up });
-                await user.addUserPick(userPick);
-            });
-
-            // 권한 생성
-            const userAuth = await UserAuth.create({ period: 0 });
-            await user.setUserAuth(userAuth); // hasOne
-
-            // 주소 생성 코드 작성 필요!
-            // const address = await Address.create({ 
-            //     jibunAddr, roadFullAddr, roadAddrPart1, roadAddrPart2,
-            //     engAddr, zipNo, siNm, sggNm, emdNm, liNm, rn,
-            //     lnbrMnnm, lnbrSlno, detail
-            // });
-            // await user.setAddress(address)
-
-            response(res, 201, "회원가입을 완료하였습니다.");
-        } else {
-            response(res, 400, "값을 입력해 주세요.")
-        }
+        response(res, 201, "회원가입을 완료하였습니다.");
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");

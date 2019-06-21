@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => (
         },
         voltType: { // 전압수전 타입 => 0: 고압수전, 1: 저압수전
             type: DataTypes.INTEGER(2),
-            allowNull: false,
+            allowNull: true,
         },
         transformerKva: { // 변압기 전체 용량 => 변압기 계산시 저장
             type: DataTypes.DOUBLE(11, 2),
