@@ -15,12 +15,9 @@ const router = express.Router();
 router.get('/', verifyToken, verifyDuplicateLogin, verifyProductSeeAuth, async (req, res, next) => {
     try {   
         // 제품 목록(옵션, 사진 포함) 가져오기
-        const products = await Product.findAll({ 
-            include: [
-                { model: ProductOpt }, 
-                { model: ProductThumb }
-            ] 
-        });
+        const products = await Product.findAll({attributes: ['id', 'name', 'category'],
+        include: [{ model: ProductOpt, limit:1, attributes: ['price']}]})
+        
         if (products.length > 0) {
             let payLoad = { products };
             response(res, 200, "장터 목록", payLoad);
