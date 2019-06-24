@@ -8,6 +8,7 @@ const flash = require('connect-flash');
 const moment = require("moment");
 const AWS = require('aws-sdk');
 const cors = require('cors'); // Cross Origin Resource Sharing
+const bodyParser = require('body-parser');
 
 require('dotenv').config();
 
@@ -64,6 +65,15 @@ const statementRouter = require('./routes/statement/index.js');
 
 // product
 const productRouter = require("./routes/product/index.js");
+
+// organization
+const organizationRouter = require("./routes/organization/index.js");
+
+//material
+const materialRouter = require("./routes/material/index.js");
+
+//document
+const documentRouter = require("./routes/document/index.js")
 /*********************** Router (End) ***********************/
 
 
@@ -116,6 +126,11 @@ app.use(session({
         secure: false,
     },
 }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    limit: '150mb',
+    extended: false,
+}));
 
 app.use(flash());
 // app.use(passport.initialize());
@@ -161,6 +176,15 @@ app.use('/statement', statementRouter);
 
 // Product
 app.use('/product', productRouter);
+
+// Organization 
+app.use('/organization', organizationRouter);
+
+//Material
+app.use('/material', materialRouter);
+
+//Document
+app.use('/document', documentRouter);
 /*********************** Router URL (End) ***********************/
 
 

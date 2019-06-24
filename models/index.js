@@ -109,13 +109,7 @@ db.User.hasOne(db.UserAuth, { foreignKey: 'user_id', sourceKey: 'id' });
 db.Announcement.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
 db.User.hasMany(db.Announcement, { foreignKey: 'user_id', sourceKey: 'id' });
 
-// Material
-db.Material.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
-db.User.hasMany(db.Material, { foreignKey: 'user_id', sourceKey: 'id' });
 
-// Document
-db.Document.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
-db.User.hasMany(db.Document, { foreignKey: 'user_id', sourceKey: 'id' });
 /**************************** Relation About User (End) ****************************/
 
 

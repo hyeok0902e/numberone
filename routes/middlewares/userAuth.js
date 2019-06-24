@@ -109,7 +109,7 @@ exports.marketPriceAuth = async (user) => {
 
 
 // 업체관리 등록 권한
-exports.veriyCompAuth = async (req, res, next) => {
+exports.verifyCompAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -128,7 +128,7 @@ exports.veriyCompAuth = async (req, res, next) => {
 }
 
 // 계산서 프로젝트 등록 권한
-exports.veriyBillAuth = async (req, res, next) => {
+exports.verifyBillAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -146,7 +146,7 @@ exports.veriyBillAuth = async (req, res, next) => {
 }
 
 // 단독계산 이용 권한
-exports.veriyBillSimplyAuth = async (req, res, next) => {
+exports.verifyBillSimplyAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -164,7 +164,7 @@ exports.veriyBillSimplyAuth = async (req, res, next) => {
 }
 
 // 사업소 이용 권한
-exports.veriyOrganizationAuth = async (req, res, next) => {
+exports.verifyOrganizationAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -181,7 +181,7 @@ exports.veriyOrganizationAuth = async (req, res, next) => {
 }
 
 // 수수료 프로젝트 등록 권한
-exports.veriyFeeAuth = async (req, res, next) => {
+exports.verifyFeeAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -198,7 +198,7 @@ exports.veriyFeeAuth = async (req, res, next) => {
 }
 
 // 내역서 등록 권한
-exports.veriyStatementAuth = async (req, res, next) => {
+exports.verifyStatementAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -215,7 +215,7 @@ exports.veriyStatementAuth = async (req, res, next) => {
 }
 
 // 자재검색 이용 권한
-exports.veriyMaterialAuth = async (req, res, next) => {
+exports.verifyMaterialAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -232,7 +232,7 @@ exports.veriyMaterialAuth = async (req, res, next) => {
 }
 
 // 자료실 이용 권한
-exports.veriyDocumentAuth = async (req, res, next) => {
+exports.verifyDocumentAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
