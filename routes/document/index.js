@@ -1,5 +1,4 @@
 const express = require('express');
-const multiparty = require('multiparty');
 const sequelize = require("sequelize");
 const Op = sequelize.Op;
 
@@ -10,7 +9,7 @@ const { Document } = require('../../models');
 // 커스텀 미들웨어
 const { response } = require('../middlewares/response');
 const { verifyMaterialAuth } = require('../middlewares/userAuth');
-const { verifyToken, asyncForEach, verifyDuplicateLogin } = require('../middlewares/main');
+const { verifyToken, verifyDuplicateLogin } = require('../middlewares/main');
 const { verifyIsAdmin } = require('../middlewares/adminAuth');
 const { uploadImg } = require('../middlewares/uploadImg');
 
@@ -22,15 +21,6 @@ const router = express.Router();
 router.post('/fileUpload', verifyToken, verifyDuplicateLogin, verifyIsAdmin, uploadImg.single('document'), async (req, res, next)=>{
     try{
         let documentUrl = req.file.location;
-        // let document = await Document.create({
-        //     num : doc.num,
-        //     fileName : doc.fileName,
-        //     fileURL: req.file.location,
-        //     mainCategory : doc.mainCategory,
-        //     middleCategory : doc.middleCategory,
-        //     subCategory : doc.subCategory
-
-        // })
         if(documentUrl){
             let payload = {documentUrl};
             response(res,'201',"자료 업로드 성공", payload);

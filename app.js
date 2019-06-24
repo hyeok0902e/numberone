@@ -74,6 +74,9 @@ const materialRouter = require("./routes/material/index.js");
 
 //document
 const documentRouter = require("./routes/document/index.js")
+
+//marketPrice
+const marketPriceRouter = require("./routes/marketPrice/index.js")
 /*********************** Router (End) ***********************/
 
 
@@ -185,6 +188,9 @@ app.use('/material', materialRouter);
 
 //Document
 app.use('/document', documentRouter);
+
+//Market Price
+app.use('/marketPrice', marketPriceRouter);
 /*********************** Router URL (End) ***********************/
 
 
