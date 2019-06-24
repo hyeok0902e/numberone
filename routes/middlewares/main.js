@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 // 모델 import
-const { User } = require('../../models');
+const { User, UserAuth} = require('../../models');
 
 // 커스텀 미들웨어
 const { response } = require('./response');
@@ -52,5 +52,25 @@ exports.verifyUid = async (tID, uID) => {
 exports.asyncForEach = async (array, callback) => {
     for (let i = 0; i < array.length; i++) {
         await callback(array[i], i ,array);
+    }
+}
+
+
+// 중복로그인 체크
+exports.verifyDuplicateLogin = async (req, res, next) =>{ // 사용자 중복확인
+    try{
+        const user = await User.findOne({ 
+            where: { id: req.decoded.user_id }, 
+            include: [{ model: UserAuth }], 
+        });
+        if (!(req.decoded.uuid==user.uuid)){
+            
+            response(res, 400, "중복 로그인"); ;
+        }
+        else{
+            return next();
+        }
+    }catch(err){
+        response(res, 404, "서버에러");
     }
 }
