@@ -120,7 +120,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                                 include: [
                                     {
                                         model: Breaker,
-                                        attributes: ['breakerVal']
+                                        attributes: ['breakerVal', 'coef', 'permAmpe']
                                     },
                                     {
                                         model: Load,
@@ -131,7 +131,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                                         include: [
                                             {
                                                 model: Breaker,
-                                                attributes: ['breakerVal']
+                                                attributes: ['breakerVal', 'coef', 'permAmpe']
                                             },
                                         ]
                                     },
@@ -144,7 +144,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                                         include: [
                                             {
                                                 model: Breaker,
-                                                attributes: ['breakerVal']
+                                                attributes: ['breakerVal', 'coef', 'permAmpe']
                                             },
                                         ]
                                     }
@@ -169,7 +169,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                         include: [
                             {
                                 model: Breaker,
-                                attributes: ['breakerVal']
+                                attributes: ['breakerVal', 'coef', 'permAmpe']
                             },
                             {
                                 model: Load,
@@ -179,7 +179,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                                 include: [
                                     {
                                         model: Breaker,
-                                        attributes: ['breakerVal']
+                                        attributes: ['breakerVal', 'coef', 'permAmpe']
                                     },
                                     {
                                         model: Load,
@@ -190,7 +190,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                                         include: [
                                             {
                                                 model: Breaker,
-                                                attributes: ['breakerVal']
+                                                attributes: ['breakerVal', 'coef', 'permAmpe']
                                             },
                                         ]
                                     },
@@ -203,7 +203,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                                         include: [
                                             {
                                                 model: Breaker,
-                                                attributes: ['breakerVal']
+                                                attributes: ['breakerVal', 'coef', 'permAmpe']
                                             },
                                         ]
                                     }
