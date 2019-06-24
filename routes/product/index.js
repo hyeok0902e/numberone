@@ -107,11 +107,6 @@ router.post('/toBucket' ,verifyToken, verifyDuplicateLogin, verifyProductSeeAuth
 
 
 
-
-
-
-
-
 // 제품 사진 등록
 router.post('/imgUpload', verifyToken, uploadImg.single('image'), (req, res) => {
     try {
@@ -124,6 +119,8 @@ router.post('/imgUpload', verifyToken, uploadImg.single('image'), (req, res) => 
         response(res, 500, "서버 에러")
     }
 });
+
+
 // 제품 등록
 router.post('/create', verifyToken, verifyDuplicateLogin, verifyProductSeeAuth, async (req, res, next) => {
     try {
