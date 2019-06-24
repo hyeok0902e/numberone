@@ -83,7 +83,7 @@ db.Product = require('./product/product')(sequelize, Sequelize);
 db.ProductOpt = require('./product/productOpt')(sequelize, Sequelize);
 db.ProductThumb = require('./product/productThumb')(sequelize, Sequelize);
 db.BucketProduct = require('./product/bucketProduct')(sequelize, Sequelize);
-db.BucketProductOpt = require('./product/bucketProduct')(sequelize, Sequelize);
+db.BucketProductOpt = require('./product/bucketProductOpt')(sequelize, Sequelize);
 db.EstimateOfBucket = require('./product/estimateOfBucket')(sequelize, Sequelize);
 
 // Document
