@@ -5,8 +5,8 @@ const { User, UserAuth, Product, ProductOpt, ProductThumb, BucketProduct, Bucket
 
 // 커스텀 미들웨어
 const { response } = require('../middlewares/response');
-const { productSeeAuth, verifyProductSeeAuth } = require('../middlewares/userAuth');
-const { exUser, verifyToken, verifyUid, asyncForEach, verifyDuplicateLogin, verifyProductSee } = require('../middlewares/main');
+const { verifyProductSeeAuth } = require('../middlewares/userAuth');
+const { exUser, verifyToken, asyncForEach, verifyDuplicateLogin } = require('../middlewares/main');
 const { uploadImg } = require('../middlewares/uploadImg');
 
 const router = express.Router();
@@ -100,10 +100,6 @@ router.post('/toBucket' ,verifyToken, verifyDuplicateLogin, verifyProductSeeAuth
         response(res, 500, "서버 에러");
     }
 });
-
-
-
-
 
 
 

@@ -56,7 +56,7 @@ exports.asyncForEach = async (array, callback) => {
 }
 
 
-
+// 중복로그인 체크
 exports.verifyDuplicateLogin = async (req, res, next) =>{ // 사용자 중복확인
     try{
         const user = await User.findOne({ 
@@ -66,24 +66,6 @@ exports.verifyDuplicateLogin = async (req, res, next) =>{ // 사용자 중복확
         if (!(req.decoded.uuid==user.uuid)){
             
             response(res, 400, "중복 로그인"); ;
-        }
-        else{
-            return next();
-        }
-    }catch(err){
-        response(res, 404, "서버에러");
-    }
-}
-
-exports.verifyProductSee = async (req,res,next) =>{
-    try{
-        const user = await User.findOne({ 
-            where: { id: req.decoded.user_id }, 
-            include: [{ model: UserAuth }], 
-        });
-        if (!(await productSeeAuth(user))) {
-            
-            response(res, 401, "권한 없음");
         }
         else{
             return next();
