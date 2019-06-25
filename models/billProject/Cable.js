@@ -72,9 +72,22 @@ module.exports = (sequelize, DataTypes) => (
             defaultValue: 0,
         },
         userThick: { // 사용자 선정 - 굵기 (㎟)
-            type: DataTypes.STRING(45),
+            type: DataTypes.INTEGER(11),
             allowNull: true,
             defaultValue: 0,
+        },
+        cableThickL: {
+            type: DataTypes.INTEGER(11),
+            allowNull: true,
+            defaultValue: 0,
+        },
+        cableRef: {
+            type: DataTypes.STRING(45),
+            allowNull: true,
+        },
+        lastValRef: {
+            type: DataTypes.INTEGER(11),
+            allowNull: true,
         },
         userVolt: { // 사용자 선정 - 전압강하 V (V)
             type: DataTypes.DOUBLE(11, 2),

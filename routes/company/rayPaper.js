@@ -34,7 +34,7 @@ router.get('/', verifyToken, async (req, res, next) => {
 
         const rayPapers = await RayPaper.findAll({ 
             where: { company_id: company.id },
-            attributes: ['checkDate']
+            attributes: ['id', 'checkDate']
         });
         // 목록이 없을 때
         if (rayPapers.length == 0) { response(res, 404, "목록이 존재하지 않습니다."); }
@@ -167,7 +167,7 @@ router.get('/:rayPaper_id/show', verifyToken, async (req, res, next) => {
     }
 });
 
-// 수정페이지 이동
+// 수정 페이지
 router.get('/:rayPaper_id/edit', verifyToken, async (req, res, next) => {
     try {
         const { rayPaper_id } = req.params;
@@ -176,8 +176,7 @@ router.get('/:rayPaper_id/edit', verifyToken, async (req, res, next) => {
         // params값 없음
         if (!rayPaper_id) { response(res, 400, "params값 없음"); return; }
         // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
-        
+        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }   
         // 중복 로그인 체크
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
         if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
@@ -186,7 +185,7 @@ router.get('/:rayPaper_id/edit', verifyToken, async (req, res, next) => {
         if (!rayPaper) { response(res, 404, "기록표가 존재하지 않습니다."); return; }
 
         let payLoad = { rayPaper };
-        response(res, 200, "적외선열화상 기록표 수정 페이지", payLoad);
+        response(res, 200, "기록표 수정 페이지", payLoad);
     } catch (err) {
         console.log(err);
         responser(res, 500, "서버 에러");
@@ -222,7 +221,7 @@ router.put('/:rayPaper_id/edit', verifyToken, async (req, res, next) => {
         )
         let resRayPaper = await RayPaper.findOne({ where: { id: rayPaper_id } });
         let payLoad = { rayPaper: resRayPaper };
-        response(res, 201, "기록표 수정 완료", payLoad);
+        response(res, 200, "기록표 수정 완료", payLoad);
     } catch (err) {
         console.log(err);
         responser(res, 500, "서버 에러");
@@ -254,5 +253,6 @@ router.delete('/delete', verifyToken, async (req, res, next) => {
 });
 
 // pdf변환
+// => show 라우터와 함께 사용 
 
 module.exports = router;

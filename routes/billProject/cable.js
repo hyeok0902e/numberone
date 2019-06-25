@@ -39,6 +39,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                     multiCircuit: bank.multiCircuit, multiCircuitVal: bank.multiCircuitVal, lastVal: bank.lastVal,
                     cableThick: bank.cableThick, cablePermAmpe: bank.cablePermAmpe, cableVolt: bank.cableVolt, cableVoltPer: bank.cableVoltPer,
                     userThick: bank.userThick, userVolt: bank.userVolt, userVoltPer: bank.userVoltPer, groundWire: bank.groundWire,
+                    cableThickL: bank.cableThickL, cableRef: bank.cableRef, lastValRef: bank.lastValRef
                 });          
                 await reBank.setCable(cable);
             }
@@ -51,6 +52,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                     multiCircuit: group.multiCircuit, multiCircuitVal: group.multiCircuitVal, lastVal: group.lastVal,
                     cableThick: group.cableThick, cablePermAmpe: group.cablePermAmpe, cableVolt: group.cableVolt, cableVoltPer: group.cableVoltPer,
                     userThick: group.userThick, userVolt: group.userVolt, userVoltPer: group.userVoltPer, groundWire: group.groundWire,
+                    cableThickL: group.cableThickL, cableRef: group.cableRef, lastValRef: group.lastValRef
                 });  
                 await reGroup.setCable(cable);
 
@@ -63,6 +65,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                         multiCircuit: motorLoad.multiCircuit, multiCircuitVal: motorLoad.multiCircuitVal, lastVal: motorLoad.lastVal,
                         cableThick: motorLoad.cableThick, cablePermAmpe: motorLoad.cablePermAmpe, cableVolt: motorLoad.cableVolt, cableVoltPer: motorLoad.cableVoltPer,
                         userThick: motorLoad.userThick, userVolt: motorLoad.userVolt, userVoltPer: motorLoad.userVoltPer, groundWire: motorLoad.groundWire,
+                        cableThickL: motorLoad.cableThickL, cableRef: motorLoad.cableRef, lastValRef: motorLoad.lastValRef
                     });   
                     await reMotorLoad.setCable(cable);
                 });
@@ -76,6 +79,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                         multiCircuit: normalSum.multiCircuit, multiCircuitVal: normalSum.multiCircuitVal, lastVal: normalSum.lastVal,
                         cableThick: normalSum.cableThick, cablePermAmpe: normalSum.cablePermAmpe, cableVolt: normalSum.cableVolt, cableVoltPer: normalSum.cableVoltPer,
                         userThick: normalSum.userThick, userVolt: normalSum.userVolt, userVoltPer: normalSum.userVoltPer, groundWire: normalSum.groundWire,
+                        cableThickL: normalSum.cableThickL, cableRef: normalSum.cableRef, lastValRef: normalSum.lastValRef
                     });   
                     await reNormalSum.setCable(cable);
                 });
