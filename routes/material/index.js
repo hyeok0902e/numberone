@@ -18,56 +18,6 @@ const router = express.Router();
 
 
 
-//자재 엑셀파일을 업로드 하는 라우터
-router.post('/fileUpload', verifyToken, verifyDuplicateLogin, verifyIsAdmin, (req, res, next)=>{
-    try{
-        const resData = {};
-        const form = new multiparty.Form({
-            autoFiles: true,
-        });
-    
-        form.on('file', (name, file) => {
-            const workbook = xlsx.readFile(file.path);
-            const sheetnames = Object.keys(workbook.Sheets);
-    
-            let i = sheetnames.length;
-    
-            while (i--) {
-                const sheetname = sheetnames[i];
-                resData[sheetname] = xlsx.utils.sheet_to_json(workbook.Sheets[sheetname]);
-            }
-        });
-        form.on('close', async () => {
-            await asyncForEach(resData.Sheet1, (data)=>{
-                Material.create({
-                    name: data.name,
-                    standard: data.standard,
-                    unit: data.unit,
-                    organizePrice: data.organizePrice,
-                    organizePage: data.organizePage,
-                    dealPrice: data.dealPrice,
-                    dealPage: data.dealPage,
-                    sellPrice: data.sellPrice,
-                    sellPage: data.sellPage,
-                    marketPrice: data.marketPrice,
-                    marketPage: data.marketPage,
-                    searchPrice: data.searchPrice,
-                    searchPage: data.searchPage,
-                    minPrice: data.minPrice,
-                    company: data.company,
-                    url: data.url
-                })
-            })
-        });
-        form.parse(req);
-        response(res, 201, "등록완료");
-
-    }catch (err) {
-        console.log(err);
-        response(res, 500, "서버 에러")
-    }
-
-})
 
 //자재 전체 목록을 보여주는 라우터
 router.get('/', verifyToken, verifyDuplicateLogin, verifyMaterialAuth, async(req, res, next)=>{

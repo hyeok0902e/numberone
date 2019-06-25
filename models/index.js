@@ -105,9 +105,9 @@ db.User.hasOne(db.Address, { foreignKey: 'user_id', sourceKey: 'id' });
 db.UserAuth.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
 db.User.hasOne(db.UserAuth, { foreignKey: 'user_id', sourceKey: 'id' });
 
-// Announcement
-db.Announcement.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
-db.User.hasMany(db.Announcement, { foreignKey: 'user_id', sourceKey: 'id' });
+// // Announcement // 유저와 공지는 연결될 필요가 없으므로 삭제함
+// db.Announcement.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
+// db.User.hasMany(db.Announcement, { foreignKey: 'user_id', sourceKey: 'id' });
 
 
 /**************************** Relation About User (End) ****************************/

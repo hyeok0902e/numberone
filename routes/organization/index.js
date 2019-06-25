@@ -18,56 +18,6 @@ const router = express.Router();
 
 
 
-//사업소 엑셀파일을 업로드 하는 라우터
-router.post('/fileUpload', verifyToken, verifyDuplicateLogin, verifyIsAdmin, (req, res, next)=>{
-    try{
-        const resData = {};
-        const form = new multiparty.Form({
-            autoFiles: true,
-        });
-    
-        form.on('file', (name, file) => {
-            const workbook = xlsx.readFile(file.path);
-            const sheetnames = Object.keys(workbook.Sheets);
-    
-            let i = sheetnames.length;
-    
-            while (i--) {
-                const sheetname = sheetnames[i];
-                resData[sheetname] = xlsx.utils.sheet_to_json(workbook.Sheets[sheetname]);
-            }
-        });
-        form.on('close', async () => {
-            await asyncForEach(resData.Sheet1, (data)=>{
-                Organization.create({
-                    name: data.name,
-                    region: data.region,
-                    zipcord: data.zipcord,
-                    address: data.address,
-                    branch: data.branch,
-                    jurisdiction: data.jurisdiction,
-                    serviceCenter: data.serviceCenter,
-                    applyTel: data.applyTel,
-                    costTel: data.costTel,
-                    fax: data.fax,
-                    supplyTel: data.supplyTel,
-                    checkTel: data.checkTel,
-                    sunTel: data.sunTel,
-                    wireTel: data.wireTel,
-                    safeTel: data.safeTel,
-                    meterTel: data.meterTel
-                })
-            })
-        });
-        form.parse(req);
-        response(res, 201, "등록완료");
-
-    }catch (err) {
-        console.log(err);
-        response(res, 500, "서버 에러")
-    }
-
-})
 
 //사업소 전체 목록을 보여주는 라우터
 router.get('/', verifyToken, verifyDuplicateLogin, verifyOrganizationAuth, async(req, res, next)=>{
@@ -84,7 +34,6 @@ router.get('/', verifyToken, verifyDuplicateLogin, verifyOrganizationAuth, async
         console.log(err);
         response(res, 500, "서버 에러")
     }
-
 })
 
 //특정 카테고리의 사업소 목록을 보여주는 라우터
