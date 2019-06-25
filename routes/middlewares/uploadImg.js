@@ -50,3 +50,19 @@ exports.uploadImg_rayPaper = multer({
     }),
     limits: { fileSize: 5 * 1024 * 1024 },
 });
+
+
+// 프로필
+exports.uploadImg_profile = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: "numberone-s3-documents",
+        contentType: multerS3.AUTO_CONTENT_TYPE, 
+        acl: 'public-read',
+        key: (req, file, cb) => {
+            console.log(file);
+            console.log(cb);
+            cb(null, file.originalname)
+        },
+    }),
+});

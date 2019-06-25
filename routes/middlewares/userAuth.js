@@ -109,7 +109,7 @@ exports.marketPriceAuth = async (user) => {
 
 
 // 업체관리 등록 권한
-exports.veriyCompAuth = async (req, res, next) => {
+exports.verifyCompAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -128,7 +128,7 @@ exports.veriyCompAuth = async (req, res, next) => {
 }
 
 // 계산서 프로젝트 등록 권한
-exports.veriyBillAuth = async (req, res, next) => {
+exports.verifyBillAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -146,7 +146,7 @@ exports.veriyBillAuth = async (req, res, next) => {
 }
 
 // 단독계산 이용 권한
-exports.veriyBillSimplyAuth = async (req, res, next) => {
+exports.verifyBillSimplyAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -164,7 +164,7 @@ exports.veriyBillSimplyAuth = async (req, res, next) => {
 }
 
 // 사업소 이용 권한
-exports.veriyOrganizationAuth = async (req, res, next) => {
+exports.verifyOrganizationAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -181,7 +181,7 @@ exports.veriyOrganizationAuth = async (req, res, next) => {
 }
 
 // 수수료 프로젝트 등록 권한
-exports.veriyFeeAuth = async (req, res, next) => {
+exports.verifyFeeAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -198,7 +198,7 @@ exports.veriyFeeAuth = async (req, res, next) => {
 }
 
 // 내역서 등록 권한
-exports.veriyStatementAuth = async (req, res, next) => {
+exports.verifyStatementAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -215,7 +215,7 @@ exports.veriyStatementAuth = async (req, res, next) => {
 }
 
 // 자재검색 이용 권한
-exports.veriyMaterialAuth = async (req, res, next) => {
+exports.verifyMaterialAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -232,7 +232,7 @@ exports.veriyMaterialAuth = async (req, res, next) => {
 }
 
 // 자료실 이용 권한
-exports.veriyDocumentAuth = async (req, res, next) => {
+exports.verifyDocumentAuth = async (req, res, next) => {
     try{
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -300,4 +300,134 @@ exports.verifyMarketPriceAuth = async (req, res, next) => {
     }catch(err){
         response(res, 404, "서버에러");
     }
+}
+
+//회원의 이용권한을 변경하는 미들웨어
+exports.changeAuth = async(user, auth, info, res, next )=>{
+    try{
+        switch(info.level){
+            case 0: // 무료회원
+                user.update({
+                    level : info.level
+                });
+                auth.update({
+                    period: info.period,
+                    compManage: 5,
+                    billProject: 1,
+                    billSimply: 1,
+                    organization: 1,
+                    feeProject: 5,
+                    statement: 1,
+                    material: 1,
+                    document: 1,
+                    product: 1,
+                    jobSearch: 0,
+                    marketPrice: 1,
+                });
+                break;
+            case 1: //개인회원 1
+                user.update({
+                    level : info.level
+                });
+                auth.update({
+                    period: info.period,
+                    compManage: 10,
+                    billProject: 3,
+                    billSimply: 1,
+                    organization: 1,
+                    feeProject: 10,
+                    statement: 3,
+                    material: 1,
+                    document: 1,
+                    product: 1,
+                    jobSearch: 1,
+                    marketPrice: 1
+                });
+                break;
+            case 2: //개인회원2
+                user.update({
+                    level : info.level
+                });
+                auth.update({
+                    period: info.period,
+                    compManage: 20,
+                    billProject: 5,
+                    billSimply: 1,
+                    organization: 1,
+                    feeProject: 20,
+                    statement: 5,
+                    material: 1,
+                    document: 1,
+                    product: 1,
+                    jobSearch: 1,
+                    marketPrice: 1
+                })
+                break;
+                
+            case 3: //개인회원 3
+                user.update({
+                    level : info.level
+                });
+                auth.update({
+                    period: info.period,
+                    compManage: 10,
+                    billProject: 3,
+                    billSimply: 1,
+                    organization: 1,
+                    feeProject: 10,
+                    statement: 3,
+                    material: 1,
+                    document: 1,
+                    product: 1,
+                    jobSearch: 1,
+                    marketPrice: 1
+                });                    
+                break;
+            
+            case 4: //개인회원 4
+                user.update({
+                    level : info.level
+                });
+                auth.update({
+                    period: info.period,
+                    compManage: 10,
+                    billProject: 3,
+                    billSimply: 1,
+                    organization: 1,
+                    feeProject: 10,
+                    statement: 3,
+                    material: 1,
+                    document: 1,
+                    product: 1,
+                    jobSearch: 1,
+                    marketPrice: 1
+                });                   
+                break;
+            
+            case 5: // 기업회원 
+                user.update({
+                    level : info.level
+                });           
+                break;
+            case 6: //장터 등록회원
+                user.update({
+                    productAuth: 1,
+                    productAuthPeriod: info.period
+                });
+                break;
+            case 7: // 시세 등록회원
+                user.update({
+                    marketAuth: 1,
+                    marketAuthPeriod: info.period
+                });
+                break;                    
+            default: // 등급에 없는 경우
+                response(res, '400', '등급 에러');
+            }
+            return next();
+
+    }catch(err){
+        response(res, 500, "서버에러");
+    }
+
 }

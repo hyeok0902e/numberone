@@ -56,6 +56,7 @@ router.get('/:product_id/show', verifyToken, verifyDuplicateLogin, verifyProduct
     }
 });
 
+//장바구니에 등록
 router.post('/toBucket' ,verifyToken, verifyDuplicateLogin, verifyProductSeeAuth, async (req, res, next) => {
     try {
         const {bucketProducts}= req.body;
