@@ -15,7 +15,7 @@ const router = express.Router();
 router.post('/', verifyToken, verifyDuplicateLogin, verifyMarketPriceAuth, async(req, res, next)=>{
     try{
         let {marketPriceInfo, addressInfo, marketPriceOpts} = req.body;
-        let user = await User.findOne({where: req.decoded.id});
+        let user = await User.findOne({where: {id: req.decoded.user_id}});
         
         let marketPrice = await MarketPrice.create({ // 시세정보 생성
             name: marketPriceInfo.name,
@@ -75,6 +75,33 @@ router.post('/', verifyToken, verifyDuplicateLogin, verifyMarketPriceAuth, async
     }
 
 })
+
+//시세정보 수정 페이지 라우터
+router.get('/edit/:id', verifyToken, verifyDuplicateLogin, verifyMarketPriceAuth, async(req, res, next)=>{
+    try{
+        let {id} = req.params;
+        let marketPrice = await MarketPrice.findOne({
+            where:{id: id},
+            include:[{model: Address}, {model: MarketPriceOpt, limit: 5}],
+        });
+        if(req.decoded.user_id!==marketPrice.user_id){ //권한 확인
+            response(res, '401', '수정권한 없음');
+        }
+
+        if(marketPrice){// 기존 시세정보 존재시
+            let payload = {marketPrice};
+            response(res, 200, "시세정보 상세 페이지", payload);
+        }
+        else{
+            response(res, 404, "에러: 존재하지 않는 시세정보");
+        }
+    }catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러")
+    }
+
+})
+
 //시세정보를 수정하는 라우터
 router.put('/edit/:id', verifyToken, verifyDuplicateLogin, verifyMarketPriceAuth, async(req, res, next)=>{
     try{
@@ -82,6 +109,11 @@ router.put('/edit/:id', verifyToken, verifyDuplicateLogin, verifyMarketPriceAuth
         let {newMarketPriceInfo, newAddressInfo, newMarketPriceOpts} = req.body;
 
         let marketPrice = await MarketPrice.findOne({where: {id: id}});//기존 시세정보
+
+        if(req.decoded.user_id!==marketPrice.user_id){ //권한 확인
+            response(res, '401', '수정권한 없음');
+        }
+
         let currentAddress = await marketPrice.getAddress();//기존 주소
         let currentMarketPriceOpts = await marketPrice.getMarketPriceOpts();// 기존 시세정보 옵션
 
@@ -125,7 +157,13 @@ router.put('/edit/:id', verifyToken, verifyDuplicateLogin, verifyMarketPriceAuth
                     response(res, 400, "에러: 옵션 생성 실패");
                 }
             });
-            response(res, 201, "시세정보 수정 완료");
+            marketPrice = await MarketPrice.findOne({
+                where: {id: id},
+                include:[{model: Address}, {model: MarketPriceOpt, limit: 5}],
+            });//변경된 시세정보
+
+            let payload = {marketPrice};
+            response(res, 201, "시세정보 수정 완료", payload);
         }
         else{
             response(res, 404, "에러: 존재하지 않는 시세정보");
@@ -143,6 +181,10 @@ router.delete('/delete/:id', verifyToken, verifyDuplicateLogin, verifyMarketPric
         let {id} = req.params;
         let marketPrice = await MarketPrice.findOne({where: {id: id}});//기존 시세정보
 
+        if(req.decoded.user_id!==marketPrice.user_id){ //권한 확인
+            response(res, '401', '수정권한 없음');
+        }
+
         if(marketPrice){// 기존 시세정보 존재시
             await marketPrice.destroy();
             response(res, 201, "시세정보 삭제 완료");
@@ -157,11 +199,12 @@ router.delete('/delete/:id', verifyToken, verifyDuplicateLogin, verifyMarketPric
 
 })
 
+//시세정보 목록을 불러오는 라우터
 router.get('/list', verifyToken, verifyDuplicateLogin, verifyMarketPriceAuth, async(req, res, next)=>{
     try{
         let marketPrices = await MarketPrice.findAll({
             attributes:['name','company'],
-            include:[{model: Address, attributes:['roadFullAddr']}, {model: MarketPriceOpt, attributes:['price'], limit: 1}],
+            include:[{model: Address, attributes:['roadFullAddr']}, {model: MarketPriceOpt, attributes:['price'], limit: 1}, {model: User, attributes:['id']}],
             order: [['id','DESC']]
         });
 
@@ -179,6 +222,7 @@ router.get('/list', verifyToken, verifyDuplicateLogin, verifyMarketPriceAuth, as
 
 })
 
+//시세정보 상세를 불러오는 라우터
 router.get('/show/:id', verifyToken, verifyDuplicateLogin, verifyMarketPriceAuth, async(req, res, next)=>{
     try{
         let {id} = req.params;

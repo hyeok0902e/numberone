@@ -301,3 +301,133 @@ exports.verifyMarketPriceAuth = async (req, res, next) => {
         response(res, 404, "서버에러");
     }
 }
+
+//회원의 이용권한을 변경하는 미들웨어
+exports.changeAuth = async(user, auth, info, res, next )=>{
+    try{
+        switch(info.level){
+            case 0: // 무료회원
+                user.update({
+                    level : info.level
+                });
+                auth.update({
+                    period: info.period,
+                    compManage: 5,
+                    billProject: 1,
+                    billSimply: 1,
+                    organization: 1,
+                    feeProject: 5,
+                    statement: 1,
+                    material: 1,
+                    document: 1,
+                    product: 1,
+                    jobSearch: 0,
+                    marketPrice: 1,
+                });
+                break;
+            case 1: //개인회원 1
+                user.update({
+                    level : info.level
+                });
+                auth.update({
+                    period: info.period,
+                    compManage: 10,
+                    billProject: 3,
+                    billSimply: 1,
+                    organization: 1,
+                    feeProject: 10,
+                    statement: 3,
+                    material: 1,
+                    document: 1,
+                    product: 1,
+                    jobSearch: 1,
+                    marketPrice: 1
+                });
+                break;
+            case 2: //개인회원2
+                user.update({
+                    level : info.level
+                });
+                auth.update({
+                    period: info.period,
+                    compManage: 20,
+                    billProject: 5,
+                    billSimply: 1,
+                    organization: 1,
+                    feeProject: 20,
+                    statement: 5,
+                    material: 1,
+                    document: 1,
+                    product: 1,
+                    jobSearch: 1,
+                    marketPrice: 1
+                })
+                break;
+                
+            case 3: //개인회원 3
+                user.update({
+                    level : info.level
+                });
+                auth.update({
+                    period: info.period,
+                    compManage: 10,
+                    billProject: 3,
+                    billSimply: 1,
+                    organization: 1,
+                    feeProject: 10,
+                    statement: 3,
+                    material: 1,
+                    document: 1,
+                    product: 1,
+                    jobSearch: 1,
+                    marketPrice: 1
+                });                    
+                break;
+            
+            case 4: //개인회원 4
+                user.update({
+                    level : info.level
+                });
+                auth.update({
+                    period: info.period,
+                    compManage: 10,
+                    billProject: 3,
+                    billSimply: 1,
+                    organization: 1,
+                    feeProject: 10,
+                    statement: 3,
+                    material: 1,
+                    document: 1,
+                    product: 1,
+                    jobSearch: 1,
+                    marketPrice: 1
+                });                   
+                break;
+            
+            case 5: // 기업회원 
+                user.update({
+                    level : info.level
+                });           
+                break;
+            case 6: //장터 등록회원
+                user.update({
+                    productAuth: 1,
+                    productAuthPeriod: info.period
+                });
+                break;
+            case 7: // 시세 등록회원
+                user.update({
+                    marketAuth: 1,
+                    marketAuthPeriod: info.period
+                });
+                break;                    
+            default: // 등급에 없는 경우
+                response(res, '400', '등급 에러');
+            }
+            return next();
+
+    }catch(err){
+        response(res, 500, "서버에러");
+    }
+
+}

@@ -77,6 +77,17 @@ const documentRouter = require("./routes/document/index.js")
 
 //marketPrice
 const marketPriceRouter = require("./routes/marketPrice/index.js")
+
+//admin
+const manageUserRouter = require('./routes/admin/user.js')
+const manageAnnouncementRouter = require('./routes/admin/announcement.js')
+const manageDatabaseRouter = require('./routes/admin/database.js')
+const manageOrganizationRouter = require('./routes/admin/organization.js')
+const manageMaterialRouter = require('./routes/admin/material.js')
+const manageDocumentRouter = require('./routes/admin/document.js')
+const manageProductRouter = require('./routes/admin/product.js')
+const manageJobSearchRouter = require('./routes/admin/jobSearch.js')
+const manageMarketPriceRouter = require('./routes/admin/marketPrice.js')
 /*********************** Router (End) ***********************/
 
 
@@ -191,6 +202,17 @@ app.use('/document', documentRouter);
 
 //Market Price
 app.use('/marketPrice', marketPriceRouter);
+
+//Admin
+app.use('/admin/user', manageUserRouter);
+app.use('/admin/announcement', manageAnnouncementRouter);
+app.use('/admin/database', manageDatabaseRouter);
+app.use('/admin/organization', manageOrganizationRouter);
+app.use('/admin/material', manageMaterialRouter);
+app.use('/admin/document', manageDocumentRouter);
+app.use('/admin/product', manageProductRouter);
+app.use('/admin/jobSearch', manageJobSearchRouter);
+app.use('/admin/marketPrice', manageMarketPriceRouter);
 /*********************** Router URL (End) ***********************/
 
 
