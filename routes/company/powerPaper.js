@@ -5,7 +5,7 @@ const { User, Address, UserAuth, PowerPaper, PowerPaperElement } = require('../.
 
 // 커스텀 미들웨어
 const { response } = require('../middlewares/response');
-const { verifyToken, verifyDuplicateLogin } = require('../middlewares/main');
+const { verifyToken, verifyDuplicateLogin, asyncForEach } = require('../middlewares/main');
 const { uploadImg } = require('../middlewares/uploadImg');
 
 const router = express.Router();
