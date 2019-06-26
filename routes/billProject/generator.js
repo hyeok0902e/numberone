@@ -41,6 +41,26 @@ router.post('/create', verifyToken, async (req, res, next) => {
             });
             await reLoad.setGenerator(generator);
             await resBillProject.addGenerator(generator);
+
+            // 발전기 설정여부 저장
+            await asyncForEach(load.Group, async (load) => {
+                await Load.update(
+                    { checkGenerator: load.gen },
+                    { where: { id: load.id }}
+                )
+                await asyncForEach(load.MotorLoad, async (load) => {
+                    await Load.update(
+                        { checkGenerator: load.gen },
+                        { where: { id: load.id }}
+                    )
+                });
+                await asyncForEach(load.NormalSum, async (load) => {
+                    await Load.update(
+                        { checkGenerator: load.gen },
+                        { where: { id: load.id }}
+                    )
+                });
+            });
         });
         
         await BillProject.update(

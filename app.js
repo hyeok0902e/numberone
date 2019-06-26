@@ -59,6 +59,11 @@ const openingPaperRouter = require('./routes/company/openingPaper.js');
 
 // feeProject
 const feeRouter = require('./routes/feeProject/index.js');
+const kepcoFeeRouter = require('./routes/feeProject/kepcoFee.js');
+const preUsageRouter = require('./routes/feeProject/preUsage.js');
+const periodUsageRouter = require('./routes/feeProject/periodUsage.js');
+const preChangeRouter = require('./routes/feeProject/preChange.js');
+const safeManageRouter = require('./routes/feeProject/safeManage.js');
 
 // statement
 const statementRouter = require('./routes/statement/index.js');
@@ -184,6 +189,11 @@ app.use('/company/openingPaper', openingPaperRouter);
 
 // feeProject
 app.use('/fee', feeRouter);
+app.use('/fee/kepcoFee', kepcoFeeRouter);
+app.use('/fee/preUsage', preUsageRouter);
+app.use('/fee/periodUsage', periodUsageRouter);
+app.use('/fee/preChange', preChangeRouter);
+app.use('/fee/safeManage', safeManageRouter);
 
 // statement
 app.use('/statement', statementRouter);

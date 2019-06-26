@@ -50,7 +50,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                     model: Load,
                     order: [['id', 'ASC']],
                     where: { type: 0 },
-                    attributes: ['id', 'type', 'name', 'thisType'],
+                    attributes: ['id', 'type', 'name', 'thisType', 'taskWay', 'output', 'pisangValA', 'pisangValB'],
                     include: [
                         {
                             model: Load,

@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => (
-    sequelize.define('KepcoFee', {
+    sequelize.define('KepcoFee', { // 한국표준시설부담금
         supplyType: { // 공급방식 / 0: 가공공급, 1: 지중공급
             type: DataTypes.INTEGER(2),
             allowNull: true,

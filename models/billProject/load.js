@@ -108,6 +108,11 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
             defaultValue: 0,
         },
+        checkGenerator: {
+            type: DataTypes.TINYINT(1),
+            allowNull: true,
+            defaultValue: 0,
+        },
         createdAt: { // 생성 시간
             type: DataTypes.DATE,
             allowNull: false,
