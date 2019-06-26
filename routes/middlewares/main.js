@@ -9,8 +9,11 @@ const { response } = require('./response');
 exports.verifyToken = async (req, res, next) => {
     try {
         req.decoded = jwt.verify(req.headers.authorization, process.env.JWT_SECRET);
-        const user = await User.findOne({ id: req.decoded.user_id });
+        
+        // 로그인 체크
+        if (!req.decoded) { response(res, 400, "로그인이 필요합니다."); return; }
 
+        const user = await User.findOne({ id: req.decoded.user_id });
         // 유저 존재여부 체크
         if (!user) { response(res, 404, "유저가 존재하지 않습니다."); return; }
 

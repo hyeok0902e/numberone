@@ -195,7 +195,7 @@ router.put('/:rayPaper_id/edit', verifyToken, verifyDuplicateLogin, async (req, 
 });
 
 // 삭제 => 여러개 삭제
-router.delete('/delete', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
+router.delete('/destroy', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
         const { rayPaper_ids } = req.body;
         // 데이터 없음

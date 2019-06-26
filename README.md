@@ -158,6 +158,16 @@
 - company/rayPaper - 수정, 수정페이지, 상세보기, 목록, 생성, 복사
 - company/testPaper - 목록, 생성
 
+### 2019.06.26(수)
+#### router
+- company
+    - openingPaper.js
+    - powerPaper.js
+    - testPaper.js
+    - rayPaper.js
+    - estimatePaper.js
+
+
 ## 해결해야 할 오류 & 이슈
 - [해결완료] routes/product/product.js => create에서 product의 productOpt와 productThumb값을 받아오지 못함.
 ### 일반부하(분전반) 생성 및 집계시 (06.02)
@@ -176,8 +186,9 @@
 - [완료] JWT Token & CleintSecret(uuid) 사용하여 로그인 인증/보안 구축
     - uuid => const uuidv4 = require('uuid/v4'); => node 교과서 411p
 - [완료] 모든 라우터에 verifyToken, verifyUid 미들웨어 적용하기
-- response 메세지 수정하기: 사용자 친화적으로
 - sequelize Pagenation
+- casecade(db) 설정 - 종속 삭제
+- 미들웨어 교체 - 간편하게
 
 ## 모델생성 및 관계세팅 진행률
 - company & paper - 100%

@@ -2,7 +2,7 @@ const express = require('express');
 const moment = require("moment");
 
 // 모델 import
-const { User, UserAuth, Company, TestPaper } = require('../../models'); 
+const { User, UserAuth, Company, TestPaper, SafeManageFee } = require('../../models'); 
 
 // 커스텀 미들웨어
 const { response } = require('../middlewares/response');
@@ -23,6 +23,7 @@ router.get('/', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
 
         const company = await Company.findOne({ where: { id: company_id} });
         if (!company) { response(res, 404, "업체가 존재하지 않습니다.") }
+        
         // 권한 체크
         if (company.user_id != user.id) { response(res, 401, "권한 없음"); return; }
         // 목록 불러오기
@@ -32,6 +33,36 @@ router.get('/', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
 
         let payLoad = { testPapers };
         response(res, 200, "전기설비 점검결과 기록표 목록", payLoad);
+    } catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러");
+    }
+});
+
+// 생성페이지
+router.get('/create', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
+    try {
+        const { company_id } = req.query;
+        // 데이터 체크
+        if (!company_id) { response(res, 400, "데이터 없음"); return; }
+
+        const user = await User.findOne({ where: { id: req.decoded.user_id } });
+        // 업체 존재여부 체크
+        const company = await Company.findOne({ where: { id: company_id } });
+        if (!company) { response(res, 404, "업체가 존재하지 않습니다."); return; }
+        // 권한 체크
+        if (company.user_id != user.id) { response(res, 401, "권한 없음"); }
+
+        const safeManageFee = await SafeManageFee.findOne({ where: { company_id } });
+
+        let payLoad = {
+            company: {
+                generateKw: safeManageFee.generateKw,
+                sunKw: safeManageFee.sunKw,
+            }
+        }
+        response(res, 200, "기록표 생성 페이지", payLoad);
+
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");
@@ -53,12 +84,19 @@ router.post('/create', verifyToken, verifyDuplicateLogin, async (req, res, next)
         const company = await Company.findOne({ where: { id: company_id } });
         if (!company) { response(res, 404, "업체가 존재하지 않습니다."); return; }
         // 권한 체크
-        if (company.user_id == user.id) { response(res, 401, "권한 없음"); }
+        if (company.user_id != user.id) { response(res, 401, "권한 없음"); }
+
+        const safeManageFee = await SafeManageFee.findOne({ where: { company_id } });
 
         let reTestPaper = await TestPaper.create({
+            //// 자동 입력
+            sunKw: safeManageFee.sunKw,
+            generateKw: safeManageFee.generateKw, 
             compName: company.name, checkDate: moment(Date.now()).format('YYYY-MM-DD'), 
-            passiveVolt: testPaper.passiveVolt, generateVolt: testPaper.generateVolt, generateKw: testPaper.generateKw, 
-            sunKw: testPaper.sunKw, contractKw: testPaper.contractKw,
+
+            //// 사용자 입력
+            passiveVolt: testPaper.passiveVolt, generateVolt: testPaper.generateVolt, 
+            contractKw: testPaper.contractKw,
             checkType: testPaper.checkType, checking: testPaper.checking, 
             // 점검 내역 - 특고압 설비 15종
             hProcess: testPaper.hProcess, hUnder: testPaper.hUnder, hSwitch: testPaper.hSwitch, hWire: testPaper.hWire, hLight: testPaper.hLight, 
@@ -79,8 +117,10 @@ router.post('/create', verifyToken, verifyDuplicateLogin, async (req, res, next)
             // 서명
             checkerName: testPaper.checkerName,
             checkerSign: testPaper.checkerSign,
-            managerName: user.name,
+            managerName: user.name, // 자동입력
             managerSign: testPaper.managerSign,
+
+            //// 자동입력
             // 회사명
             userCompName: user.company, 
             // 대표 번호
@@ -139,8 +179,6 @@ router.get('/:testPaper_id/show', verifyToken, verifyDuplicateLogin, async (req,
 
         // 데이터 체크
         if (!testPaper_id) { response(res, 400, "데이터 없음"); return; }
-        // 중복 로그인 체크
-        const user = await User.findOne({ where: { id: req.decoded.user_id } });
 
         // 기록표 존재여부 체크
         let testPaper = await TestPaper.findOne({ where: { id: testPaper_id } });
@@ -161,8 +199,6 @@ router.get('/:testPaper_id/edit', verifyToken, verifyDuplicateLogin, async (req,
 
         // 데이터 체크
         if (!testPaper_id) { response(res, 400, "데이터 없음"); return; }
-
-        const user = await User.findOne({ where: { id: req.decoded.user_id } });
 
         // 기록표 존재여부 체크
         let testPaper = await TestPaper.findOne({ where: { id: testPaper_id } });
@@ -188,8 +224,6 @@ router.put('/:testPaper_id/edit', verifyToken, verifyDuplicateLogin, async (req,
         // params값 없음
         if (!testPaper_id) { response(res, 400, "params값 없음"); return; }
  
-        const user = await User.findOne({ where: { id: req.decoded.user_id } });
-
         // 기록표 존재여부 체크
         let reTestPaper = await TestPaper.findOne({ where: { id: testPaper_id } });
         if (!reTestPaper) { response(res, 404, "기록표가 존재하지 않습니다."); return; }
@@ -197,8 +231,8 @@ router.put('/:testPaper_id/edit', verifyToken, verifyDuplicateLogin, async (req,
         // 기록표 업데이트
         await TestPaper.update(
             {
-                passiveVolt: testPaper.passiveVolt, generateVolt: testPaper.generateVolt, generateKw: testPaper.generateKw, 
-                sunKw: testPaper.sunKw, contractKw: testPaper.contractKw,
+                passiveVolt: testPaper.passiveVolt, generateVolt: testPaper.generateVolt, 
+                contractKw: testPaper.contractKw,
                 checkType: testPaper.checkType, checking: testPaper.checking, 
                 // 점검 내역 - 특고압 설비 15종
                 hProcess: testPaper.hProcess, hUnder: testPaper.hUnder, hSwitch: testPaper.hSwitch, hWire: testPaper.hWire, hLight: testPaper.hLight, 
@@ -236,7 +270,7 @@ router.put('/:testPaper_id/edit', verifyToken, verifyDuplicateLogin, async (req,
 // => show 라우터와 함께 사용
 
 // 삭제
-router.delete('/delete', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
+router.delete('/destroy', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
         const { testPaper_ids } = req.body;
 
