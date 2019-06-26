@@ -6,26 +6,20 @@ const { User, UserAuth, Company, TestPaper } = require('../../models');
 
 // 커스텀 미들웨어
 const { response } = require('../middlewares/response');
-const { exUser, verifyToken, verifyUid } = require('../middlewares/main');
-const { compAuth } = require('../middlewares/userAuth');
+const { verifyToken, verifyDuplicateLogin, } = require('../middlewares/main');
 const { uploadImg } = require('../middlewares/uploadImg');
 
 // /company/testPaper
 const router = express.Router();
 
 // 기록표 목록
-router.get('/', verifyToken, async (req, res, next) => {
+router.get('/', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
         const { company_id } = req.body;
-        // 로그인 체크
-        if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
         // 데이터 체크
         if (!company_id) { response(res, 400, "데이터 없음"); return; }
-        // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }    
-        // 중복 로그인 체크
+
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
 
         const company = await Company.findOne({ where: { id: company_id} });
         if (!company) { response(res, 404, "업체가 존재하지 않습니다.") }
@@ -45,22 +39,16 @@ router.get('/', verifyToken, async (req, res, next) => {
 });
 
 // 생성
-router.post('/create', verifyToken, async (req, res, next) => {
+router.post('/create', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
         // 필수 입력값: 업체 명, 점검 날짜
         const { company_id, testPaper } = req.body
 
-        // 로그인 체크
-        if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
         // 데이터 체크
         if (!company_id) { response(res, 400, "데이터 없음"); return; }
         if (!testPaper) { response(res, 400, "데이터 없음"); return; }
-        // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
 
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
-        // 중복 로그인 체크
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
         // 업체 존재여부 체크
         const company = await Company.findOne({ where: { id: company_id } });
         if (!company) { response(res, 404, "업체가 존재하지 않습니다."); return; }
@@ -111,19 +99,14 @@ router.post('/create', verifyToken, async (req, res, next) => {
 });
 
 // 복사
-router.post('/:testPaper_id/copy', verifyToken, async (req, res, next) => {
+router.post('/:testPaper_id/copy', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {   
         const { testPaper_id } = req.params;
-        // 로그인 체크
-        if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
         // params값 없음
         if (!testPaper_id) { response(res, 400, "params값 없음"); return; }
-        // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
 
-        // 중복 로그인 체크
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
+    
         // 기록표 존재여부 체크
         let testPaper = await TestPaper.findOne({ where: { id: testPaper_id } });
         if (!testPaper) { response(res, 404, "기록표가 존재하지 않습니다."); return; }
@@ -150,18 +133,15 @@ router.post('/:testPaper_id/copy', verifyToken, async (req, res, next) => {
 });
 
 // 상세보기
-router.get('/:testPaper_id/show', verifyToken, async (req, res, next) => {
+router.get('/:testPaper_id/show', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {   
         const { testPaper_id } = req.params;
-        // 로그인 체크
-        if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
+
         // 데이터 체크
         if (!testPaper_id) { response(res, 400, "데이터 없음"); return; }
-        // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
         // 중복 로그인 체크
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
+
         // 기록표 존재여부 체크
         let testPaper = await TestPaper.findOne({ where: { id: testPaper_id } });
         if (!testPaper) { response(res, 404, "기록표가 존재하지 않습니다."); return; }
@@ -175,18 +155,15 @@ router.get('/:testPaper_id/show', verifyToken, async (req, res, next) => {
 });
 
 // 수정 페이지
-router.get('/:testPaper_id/edit', verifyToken, async (req, res, next) => {
+router.get('/:testPaper_id/edit', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
         const { testPaper_id } = req.params;
-        // 로그인 체크
-        if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
+
         // 데이터 체크
         if (!testPaper_id) { response(res, 400, "데이터 없음"); return; }
-        // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
-        // 중복 로그인 체크
+
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
+
         // 기록표 존재여부 체크
         let testPaper = await TestPaper.findOne({ where: { id: testPaper_id } });
         if (!testPaper) { response(res, 404, "기록표가 존재하지 않습니다."); return; }
@@ -201,21 +178,18 @@ router.get('/:testPaper_id/edit', verifyToken, async (req, res, next) => {
 });
 
 // 수정
-router.put('/:testPaper_id/edit', verifyToken, async (req, res, next) => {
+router.put('/:testPaper_id/edit', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
         const { testPaper_id } = req.params;
         const { testPaper } = req.body;
-        // 로그인 체크
-        if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
+
         // 데이터 없음
         if (!testPaper) { response(res, 400, "데이터 없음"); return; }
         // params값 없음
         if (!testPaper_id) { response(res, 400, "params값 없음"); return; }
-        // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; } 
-        // 중복 로그인 체크
+ 
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
+
         // 기록표 존재여부 체크
         let reTestPaper = await TestPaper.findOne({ where: { id: testPaper_id } });
         if (!reTestPaper) { response(res, 404, "기록표가 존재하지 않습니다."); return; }
@@ -262,18 +236,14 @@ router.put('/:testPaper_id/edit', verifyToken, async (req, res, next) => {
 // => show 라우터와 함께 사용
 
 // 삭제
-router.delete('/delete', verifyToken, async (req, res, next) => {
+router.delete('/delete', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
         const { testPaper_ids } = req.body;
-        // 로그인 체크
-        if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
+
         // 데이터 없음
         if (!rayPaper_ids) { response(res, 400, "데이터 없음"); return; }
-        // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
-        // 중복 로그인 체크
+
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
 
         await asyncForEach(testPaper_ids, async (id) => {
             await TestPaper.destroy({ where: { id } });

@@ -13,7 +13,7 @@ const router = express.Router();
 // 콘덴서 생성  - 고압 수전시
 router.post('/high/create', verifyToken, async (req, res, next) => {
     try {
-        const { billProject} = req.body;
+        const { billProject } = req.body;
         // 로그인 체크
         if (!req.decoded.user_id) { response(res, 400, "로그인이 필요합니다."); return; }
         // 데이터 체크
@@ -67,10 +67,14 @@ router.post('/high/create', verifyToken, async (req, res, next) => {
             });
         });
 
+        await BillProject.update(
+            { step: "condenser" },
+            { where: { id: billProject.id } }
+        );
         // 다음 계산시 필요 데이터 
         let resBillProject = await BillProject.findOne({
             where: { id: billProject.id },
-            attributes: ['id', 'name', 'voltType'],
+            attributes: ['id', 'voltType', 'name', 'step'],
             include: [
                 {
                     model: Load,
@@ -173,9 +177,14 @@ router.post('/low/create', verifyToken, async (req, res, next) => {
             });    
         });
         
+        await BillProject.update(
+            { step: "condenser" },
+            { where: { id: billProject.id } }
+        );
+
         let resBillProject = await BillProject.findOne({
             where: { id: billProject.id },
-            attributes: ['id', 'name', 'voltType'],
+            attributes: ['id', 'voltType', 'name', 'step'],
             include: [
                 {
                     model: Load,

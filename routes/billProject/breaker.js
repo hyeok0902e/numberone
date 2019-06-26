@@ -98,13 +98,17 @@ router.post('/create', verifyToken, async (req, res, next) => {
             });
         });
 
+        await BillProject.update(
+            { step: "breaker" },
+            { where: { id: billProject.id } }
+        );
         // 데이터 준비
         let payLoad = {};
         if (billProject.voltType == 0) { // 고압수전시
 
             const resBillProject = await BillProject.findOne({ 
                 where: { id: billProject.id },
-                attributes: ['id', 'name', 'voltType'],
+                attributes: ['id', 'name', 'voltType', 'step'],
                 include: [
                     {
                         model: Load,

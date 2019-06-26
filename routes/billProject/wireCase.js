@@ -66,10 +66,14 @@ router.post('/create', verifyToken, async (req, res, next) => {
             });
         });
 
+        await BillProject.update(
+            { step: "wirecase" },
+            { where: { id: billProject.id } }
+        );
         // 트레이 계산 데이터 준비
         let resBillProject = await BillProject.findOne({
             where: { id: billProject.id },
-            attributes: ['id', 'name', 'voltType'],
+            attributes: ['id', 'name', 'voltType', 'step'],
             include: [
                 { 
                     model: Load,

@@ -37,9 +37,14 @@ router.post('/create', verifyToken, async (req, res, next) => {
             });
         });
 
+        await BillProject.update(
+            { step: "tray" },
+            { where: { id: billProject.id } }
+        );
+
         let resBillProject = await BillProject.findOne({
             where: { id: billProject.id },
-            attributes: ['id', 'name', 'voltType'],
+            attributes: ['id', 'name', 'voltType', 'step'],
             include: [
                 {
                     model: Load,

@@ -64,7 +64,7 @@ router.post('/high/create', verifyToken, async (req, res, next) => {
 
         // 계산서 프로젝트 테이블 업데이트
         await BillProject.update(
-            { elecConvertVal: billProject.ceSum, loadSimplyCE: billProject.loadSimplyCE, outputCE: billProject.outputCE },
+            { elecConvertVal: billProject.ceSum, loadSimplyCE: billProject.loadSimplyCE, outputCE: billProject.outputCE, step: "ce" },
             { where: { id: billProject.id } }
         )
 
@@ -78,7 +78,7 @@ router.post('/high/create', verifyToken, async (req, res, next) => {
         // 고압 수전 일 때 payLoad
         let resBillProject = await BillProject.findOne({
             where: { id: billProject.id },
-            attributes: ['id', 'voltType', 'name', 'transformerKva', 'volt'],
+            attributes: ['id', 'voltType', 'name', 'step', 'transformerKva', 'volt'],
             include: [{ 
                 model: Load, 
                 where: { type: 0 },
@@ -157,11 +157,11 @@ router.post('/low/create', verifyToken, async (req, res, next) => {
                 volt = 220;
             }
         });
-        await BillProject.update({ volt }, { where: { id: billProject.id }});
+        await BillProject.update({ volt, step: "ce" }, { where: { id: billProject.id }});
         // 저압 수전일 때 payLoad
         let resBillProject = await BillProject.findOne({
             where: { id: billProject.id },
-            attributes: ['id', 'voltType', 'name', 'loadSimplyCE', 'volt']
+            attributes: ['id', 'voltType', 'name', 'step', 'loadSimplyCE', 'volt']
         });
         payLoad = { billProject: resBillProject }
      

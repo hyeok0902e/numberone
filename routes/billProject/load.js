@@ -36,7 +36,7 @@ router.post('/create', verifyToken, async(req, res, next) => {
         if (!(await billAuth(user))) { response(res, 401, "권한 없음"); return; }
 
         // 계산서 생성
-        const newBillProject = await BillProject.create({ voltType, name: billProjectName })
+        const newBillProject = await BillProject.create({ voltType, name: billProjectName, step: 0 })
 
         // 부하 생성
         // 뱅크부
@@ -134,11 +134,17 @@ router.post('/create', verifyToken, async(req, res, next) => {
             }
         });
 
+        // 계산서 스텝 업데이트
+        await BillProject.update(
+            { step: "load" },
+            { where: { id: newBillProject.id } }  
+        );
+
         let payLoad = {}
         if (newBillProject.voltType == 0) { // 고압일 경우 => 변압기 계산
             let billProject = await BillProject.findOne({
                 where: { id: newBillProject.id },
-                attributes: ['id', 'voltType', 'name'],
+                attributes: ['id', 'voltType', 'name', 'step'],
                 include: [
                     {
                         // 뱅크

@@ -62,10 +62,13 @@ router.post('/high/create', verifyToken, async (req, res, next) => {
             });
             await reBank.setBankPE_High(bankPE);
         });
-
+        await BillProject.update(
+            { step: "pe" },
+            { where: { id: reBillProject.id } }
+        )
         const resBillProject = await BillProject.findOne({ 
             where: { id: billProject.id },
-            attributes: ['id', 'voltType', 'name'],
+            attributes: ['id', 'voltType', 'name', 'step'],
             include: [
                 { 
                     model: Load,
@@ -146,9 +149,13 @@ router.post('/low/create', verifyToken, async (req, res, next) => {
         await reBillProject.setPE_Low(mainPE);
         // 데이터 준비 => 콘덴서(고압/저압)
         
+        await BillProject.update(
+            { step: "pe" },
+            { where: { id: reBillProject.id } }
+        )
         const resBillProject = await BillProject.findOne({
             where: { id: billProject.id },
-            attributes: ['id', 'voltType', 'name'],
+            attributes: ['id', 'voltType', 'name', 'step'],
             include: [
                 {
                     model: Load,

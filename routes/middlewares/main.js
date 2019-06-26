@@ -1,14 +1,19 @@
 const jwt = require('jsonwebtoken');
 
 // 모델 import
-const { User, UserAuth} = require('../../models');
+const { User, UserAuth } = require('../../models');
 
 // 커스텀 미들웨어
 const { response } = require('./response');
 
-exports.verifyToken = (req, res, next) => {
+exports.verifyToken = async (req, res, next) => {
     try {
         req.decoded = jwt.verify(req.headers.authorization, process.env.JWT_SECRET);
+        const user = await User.findOne({ id: req.decoded.user_id });
+
+        // 유저 존재여부 체크
+        if (!user) { response(res, 404, "유저가 존재하지 않습니다."); return; }
+
         return next();
     } catch (err) {
         if (err.name === 'TokenExpiredError') {

@@ -43,6 +43,11 @@ router.post('/create', verifyToken, async (req, res, next) => {
             await resBillProject.addGenerator(generator);
         });
         
+        await BillProject.update(
+            { step: "generator" },
+            { where: { id: billProject.id } }
+        );
+        resBillProject = await BillProject.findOne({ where: { id: billProject.id } });
         // 프로젝트 내역서 데이터 준비
         let thisBanks = await Load.findAll({ where: { billProject_id: billProject.id, type: 0 } });
         let thisGroups = await Load.findAll({ where: { billProject_id: billProject.id, type: 1 } });
@@ -89,10 +94,13 @@ router.post('/create', verifyToken, async (req, res, next) => {
             meterInfo2 = lowPe.meterCTCapa; 
         }
 
+        
         let payLoad = {
             billProject: {
+                step: resBillProject.step,
                 name: resBillProject.name,
                 voltType: billProject.voltType,
+                step: "generator",
                 createdAt: resBillProject.createdAt,
                 ce: resBillProject.loadSimplyCE,
                 outputCE: resBillProject.outputCE,

@@ -99,12 +99,12 @@ router.post('/create', verifyToken, async (req, res, next) => {
         });
         
         // 프로젝트 DB에 변압기 전체 용량 저장
-        await BillProject.update({ transformerKva, volt: 22900 }, { where: { id: billProject.id } });
+        await BillProject.update({ transformerKva, volt: 22900, step: "transformer" }, { where: { id: billProject.id } });
 
         // 데이터 준비 => 계약전력
         let resBillProject = await BillProject.findOne({
             where: { id: billProject.id },
-            attributes: ['id', 'voltType', 'name'],
+            attributes: ['id', 'voltType', 'name', 'step'],
             include: [
                 {
                     model: Load,

@@ -88,6 +88,10 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: false,
             defaultValue: 0,
         },  
+        step: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         memo: { // 메모
             type: DataTypes.TEXT,
             allowNull: true,

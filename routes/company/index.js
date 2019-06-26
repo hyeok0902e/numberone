@@ -5,23 +5,18 @@ const { User, Company, SafeManageFee, UserAuth, Address } = require('../../model
 
 // 커스텀 미들웨어
 const { response } = require('../middlewares/response');
-const { exUser, verifyToken, verifyUid } = require('../middlewares/main');
-const { compAuth } = require('../middlewares/userAuth');
+const { exUser, verifyToken, verifyDuplicateLogin } = require('../middlewares/main');
+const { compAuth, verifyCompAuth } = require('../middlewares/userAuth');
 
 const router = express.Router();
 
 // 업체 목록 - 권한 체크 X
-router.get('/', verifyToken, async (req, res, next) => {
+router.get('/', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
         // 로그인 체크
         if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
         // 유저 존재여부 체크
         if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
-
-        const user = await User.findOne({ where: { id: req.decoded.user_id }, include: [{ model: UserAuth }], });
-        // 중복 로그인 체크
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
-
         // 업체 목록 가져오기
         const companies = await Company.findAll({
             where: { user_id: user.id },
@@ -41,7 +36,7 @@ router.get('/', verifyToken, async (req, res, next) => {
 });
 
 // 업체 상세보기
-router.get('/:company_id/show', verifyToken, async (req, res, next) => {
+router.get('/:company_id/show', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
         const { company_id } = req.params;
 
@@ -53,8 +48,6 @@ router.get('/:company_id/show', verifyToken, async (req, res, next) => {
         if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
 
         const user = await User.findOne({ where: { id: req.decoded.user_id }, include: [{ model: UserAuth }], });
-        // 중복 로그인 체크
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
         // 업체 존재여부 체크
         const company = await Company.findOne({ where: { id: company_id } });
         if (!company) { response(res, 404, "업체가 존재하지 않습니다."); return; }
@@ -73,7 +66,7 @@ router.get('/:company_id/show', verifyToken, async (req, res, next) => {
 });
 
 // 업체 등록
-router.post('/create', verifyToken, async (req, res, next) => {
+router.post('/create', verifyToken, verifyDuplicateLogin, verifyCompAuth, async (req, res, next) => {
     try {
         const { newCompany } = req.body; 
 
@@ -84,10 +77,6 @@ router.post('/create', verifyToken, async (req, res, next) => {
         // 유저 존재여부 체크
         if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
         const user = await User.findOne({ where: { id: req.decoded.user_id }, include: [{ model: UserAuth }], });
-        // 중복 로그인 체크
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
-        // 업체 등록 권한 체크
-        if (!(await compAuth(user))) { response(res, 401, "권한 없음"); return; }
 
         // 업체 생성
         let company = await Company.create({ 
@@ -139,28 +128,17 @@ router.post('/create', verifyToken, async (req, res, next) => {
 });
 
 // 업체 편집 페이지 이동
-router.get('/:company_id/edit', verifyToken, async (req, res, next) => {
+router.get('/:company_id/edit', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
         const { company_id } = req.params;
 
         // 로그인 체크
         if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
-
         // params값 체크
         if (!company_id) { response(res, 400, "params값 없음"); return; }
-
         // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) {
-            response(res, 404, "사용자가 존재하지 않습니다.");
-            return;
-        }
-
-        // 중복 로그인 체크
+        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
-            response(res, 400, "중복 로그인"); 
-            return;
-        }
 
         // 업체 존재여부 체크
         const company = await Company.findOne({ where: { id: company_id }});
@@ -185,7 +163,7 @@ router.get('/:company_id/edit', verifyToken, async (req, res, next) => {
 });
 
 // 업체 편집 
-router.put('/:company_id/edit', verifyToken, async (req, res, next) => {
+router.put('/:company_id/edit', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
         const { reCompany } = req.body; 
         const { company_id } = req.params;
@@ -200,8 +178,6 @@ router.put('/:company_id/edit', verifyToken, async (req, res, next) => {
         if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
 
         const user = await User.findOne({ where: { id: req.decoded.user_id } });   
-        // 중복 로그인 체크
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) { response(res, 400, "중복 로그인"); return; }
         // 업체 존재여부 체크
         let company = await Company.findOne({ where: { id: company_id }});
         if (!company) { response(res, 404, "업체가 존재 하지 않습니다."); return; }
@@ -255,38 +231,22 @@ router.put('/:company_id/edit', verifyToken, async (req, res, next) => {
 });
 
 // 업체 삭제
-router.delete('/:company_id/delete', verifyToken, async (req, res, next) => {
+router.delete('/:company_id/delete', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
         const { company_id } = req.params;
-
         // 로그인 체크
         if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
-      
         // params값 체크
         if (!company_id) { response(res, 400, "params값 없음"); return; }
-
         // 유저 존재여부 체크
         if (!(await exUser(req.decoded.user_id))) {
             response(res, 404, "사용자가 존재하지 않습니다.");
             return;
         }
 
-        const user = await User.findOne({ 
-            where: { id: req.decoded.user_id }, 
-            include: [{ model: UserAuth }], 
-        });
-
-        // 중복 로그인 체크
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
-            response(res, 400, "중복 로그인"); 
-            return;
-        }
-
+        const user = await User.findOne({ where: { id: req.decoded.user_id }, include: [{ model: UserAuth }], });
         // 업체 등록 권한 체크
-        if (!(await compAuth(user))) {
-            response(res, 401, "권한 없음");
-            return;
-        }
+        if (!(await compAuth(user))) { response(res, 401, "권한 없음"); return; }
 
         // 업체 존재여부 체크
         let company = await Company.findOne({ where: { id: company_id }});
@@ -306,9 +266,9 @@ router.delete('/:company_id/delete', verifyToken, async (req, res, next) => {
 });
 
 // 메모 편집 페이지 이동
-router.get('/:company_id/memo', verifyToken, async (req, res, next) => {
+router.get('/:company_id/memo', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
-    
+
         const { company_id } = req.params;
 
         // 로그인 체크
@@ -318,18 +278,9 @@ router.get('/:company_id/memo', verifyToken, async (req, res, next) => {
         if (!company_id) { response(res, 400, "params값 없음"); return; }
 
         // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) {
-            response(res, 404, "사용자가 존재하지 않습니다.");
-            return;
-        }
-
+        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
 
-        // 중복 로그인 체크
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
-            response(res, 400, "중복 로그인"); 
-            return;
-        }
 
         // 업체 존재여부 체크
         const company = await Company.findOne({ where: { id: company_id }});
@@ -349,33 +300,20 @@ router.get('/:company_id/memo', verifyToken, async (req, res, next) => {
 });
 
 // 메모 편집
-router.put('/:company_id/memo', verifyToken, async (req, res, next) => {
+router.put('/:company_id/memo', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
         const { memo } = req.query;
         const { company_id } = req.params;
 
         // 로그인 체크
         if (!req.decoded.user_id) { responser(res, 400, "로그인이 필요합니다."); return; }
-        
         // 입력값 체크
         if (!memo) { memo = ""; }
-
         // params값 체크
         if (!company_id) { response(res, 400, "params값 없음"); return; }
-
         // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) {
-            response(res, 404, "사용자가 존재하지 않습니다.");
-            return;
-        }
-
+        if (!(await exUser(req.decoded.user_id))) { response(res, 404, "사용자가 존재하지 않습니다."); return; }
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
-
-        // 중복 로그인 체크
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
-            response(res, 400, "중복 로그인"); 
-            return;
-        }
 
         // 업체 존재여부 체크
         const company = await Company.findOne({ where: { id: company_id }});
