@@ -5,16 +5,16 @@ const { Document } = require('../../models');
 
 // 커스텀 미들웨어
 const { response } = require('../middlewares/response');
-const { verifyToken, asyncForEach, verifyDuplicateLogin } = require('../middlewares/main');
+const { verifyToken, verifyDuplicateLogin } = require('../middlewares/main');
 const { verifyIsAdmin } = require('../middlewares/adminAuth');
-const { uploadImg } = require('../middlewares/uploadImg');
+const { uploadDocument } = require('../middlewares/uploadImg');
 
 const router = express.Router();
 
 
 
 //자료실 파일을 업로드 하는 라우터
-router.post('/fileUpload', verifyToken, verifyDuplicateLogin, verifyIsAdmin, uploadImg.single('document'), async (req, res, next)=>{
+router.post('/fileUpload', verifyToken, verifyDuplicateLogin, verifyIsAdmin, uploadDocument.single('document'), async (req, res, next)=>{
     try{
         let documentUrl = req.file.location;
         if(documentUrl){
@@ -52,7 +52,6 @@ router.post('/', verifyToken, verifyDuplicateLogin, verifyIsAdmin, async (req, r
         console.log(err);
         response(res, 500, "서버 에러")
     }
-
 })
 
 //자료 전체 목록을 보여주는 라우터
@@ -90,6 +89,53 @@ router.get('/edit/:id', verifyToken, verifyDuplicateLogin, verifyIsAdmin, async 
 })
 
 
+//자료 수정 라우터
+router.put('/edit/:id', verifyToken, verifyDuplicateLogin, verifyIsAdmin, async (req, res, next)=>{
+    try{
+        let doc = req.body.doc;
+        let document = await Document.findOne({where: {id: req.params.id}});
+
+    if(document){
+        document.update({
+            num : doc.num,
+            fileName : doc.fileName,
+            fileURL: doc.url,
+            mainCategory : doc.mainCategory,
+            middleCategory : doc.middleCategory,
+            subCategory : doc.subCategory
+        });
+        let payload = {document};
+        response(res, '201', '자료 수정 성공', payload)
+    }
+    else{
+        response(res, '404', "자료없음");
+    }
+
+    }catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러")
+    }
+})
+
+
+//자료 삭제 라우터
+router.delete('/delete/:id', verifyToken, verifyDuplicateLogin, verifyIsAdmin, async (req, res, next)=>{
+    try{
+        let document = await Document.findOne({where: {id: req.params.id}});
+
+    if(document){
+        document.destroy();
+        response(res, '201', '자료 삭제 성공')
+    }
+    else{
+        response(res, '404', "자료없음");
+    }
+
+    }catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러")
+    }
+})
 
 
 

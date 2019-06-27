@@ -40,7 +40,7 @@ router.get('/', verifyToken, verifyDuplicateLogin, verifyMaterialAuth, async(req
 //검색되는 자재를 보여주는 라우터
 router.get('/search', verifyToken, verifyDuplicateLogin, verifyMaterialAuth, async(req, res, next)=>{
     try{
-        let materials = await Material.findAll({where: {name:{ [Op.like]:'%'+req.body.keyword+'%'}}, attributes:['id', 'name', 'standard', 'unit', 'organizePrice','marketPrice']});
+        let materials = await Material.findAll({where: {name:{ [Op.like]:'%'+req.params.keyword+'%'}}, attributes:['id', 'name', 'standard', 'unit', 'organizePrice','marketPrice']});
         
         if(materials){
             let payload = {materials};

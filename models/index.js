@@ -287,8 +287,10 @@ db.Seeking.hasMany(db.Labor, { foreignKey: 'seeking_id', sourceKey: 'id' });
 
 
 /************************** Relation About Product (Start) **************************/
-db.Product.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
-db.User.hasMany(db.Product, { foreignKey: 'user_id', sourceKey: 'id' });
+// db.Product.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
+// db.User.hasMany(db.Product, { foreignKey: 'user_id', sourceKey: 'id' });
+// 제품은 관리자로부터 등록되나 둘이 연관되어 있는 개념이 아니므로 관계설정을 삭제함
+
 
 db.ProductThumb.belongsTo(db.Product, { foreignKey: 'product_id', targetKey: 'id' });
 db.Product.hasMany(db.ProductThumb, { foreignKey: 'product_id', sourceKey: 'id' });

@@ -38,7 +38,7 @@ router.post('/fileUpload', verifyToken, verifyDuplicateLogin, verifyIsAdmin, upl
 //검색되는 자료 보여주는 라우터
 router.get('/search', verifyToken, verifyDuplicateLogin, verifyMaterialAuth, async(req, res, next)=>{
     try{
-        let documents = await Document.findAll({where: {fileName:{ [Op.like]:'%'+req.body.keyword+'%'} }});
+        let documents = await Document.findAll({where: {fileName:{ [Op.like]:'%'+req.params.keyword+'%'} }});
         if(documents){
             let payload = {documents};
             response(res, '200', "자료 목록", payload);

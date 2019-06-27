@@ -11,8 +11,7 @@ const {  Organization } = require('../../models');
 // 커스텀 미들웨어
 const { response } = require('../middlewares/response');
 const { verifyOrganizationAuth } = require('../middlewares/userAuth');
-const { verifyToken, asyncForEach, verifyDuplicateLogin } = require('../middlewares/main');
-const { verifyIsAdmin } = require('../middlewares/adminAuth');
+const { verifyToken, verifyDuplicateLogin } = require('../middlewares/main');
 
 const router = express.Router();
 
@@ -86,7 +85,8 @@ router.get('/show/:id', verifyToken, verifyDuplicateLogin, verifyOrganizationAut
 //검색되는 사업소를 보여주는 라우터
 router.get('/search', verifyToken, verifyDuplicateLogin, verifyOrganizationAuth, async(req, res, next)=>{
     try{
-        let organizations = await Organization.findAll({where: {jurisdiction:{ [Op.like]:'%'+req.body.keyword+'%'}}, attributes:['id', 'name', 'region', 'branch', 'jurisdiction','serviceCenter']});
+        console.log(req.query.keyword);
+        let organizations = await Organization.findAll({where: {jurisdiction:{ [Op.like]:'%'+req.query.keyword+'%'}}, attributes:['id', 'name', 'region', 'branch', 'jurisdiction','serviceCenter']});
         if(organizations){
             let payload = {organizations};
             response(res, '200', "사업소 목록", payload);

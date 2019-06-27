@@ -95,8 +95,6 @@ router.get('/category/:categoryNum', verifyToken, verifyDuplicateLogin, verifyIs
             5: "전기공사",
             6: "전기안전관리"
         }
-        console.log(category[req.params.categoryNum]);
-
         let organizations = await Organization.findAll({where:{name: category[req.params.categoryNum]}, attributes:['id', 'name', 'region', 'branch', 'jurisdiction','serviceCenter']});
         if(organizations){
             let payload = {organizations};
