@@ -120,23 +120,23 @@ router.get('/:feeProject_id/show', verifyToken, verifyDuplicateLogin, async (req
             include: [
                 {
                     model: KepcoFee,
-                    attributes: ['totalCost']
+                    attributes: ['id', 'totalCost']
                 },
                 {
                     model: PreUsage,
-                    attributes: ['totalCost']
+                    attributes: ['id', 'totalCost']
                 },
                 {
                     model: PeriodUsage,
-                    attributes: ['totalCost']
+                    attributes: ['id', 'totalCost']
                 },
                 {
                     model: PreChange,
-                    attributes: ['totalCost']
+                    attributes: ['id', 'totalCost']
                 },
                 {
                     model: SafeManage,
-                    attributes: ['fee']
+                    attributes: ['id', 'fee']
                 }
             ] 
         });
