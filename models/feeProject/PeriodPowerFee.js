@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => (
-    sequelize.define('PeriodReceptFee', { // 정기검사 수수료 - 발전설비
+    sequelize.define('PeriodPowerFee', { // 정기검사 수수료 - 발전설비
         checkType: { // 검사유형 / 0: 최초검사, 1: 불합격재검사
             type: DataTypes.INTEGER(2),
             allowNull: true,

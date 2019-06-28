@@ -240,7 +240,7 @@ db.PeriodReceptFee.belongsTo(db.PeriodUsage, { foreignKey: 'periodUsage_id', tar
 db.PeriodUsage.hasOne(db.PeriodReceptFee, { foreignKey: 'periodUsage_id', sourceKey: 'id' });
 
 db.PeriodPowerFee.belongsTo(db.PeriodUsage, { foreignKey: 'periodUsage_id', targetKey: 'id' });
-db.PeriodReceptFee.hasMany(db.PeriodPowerFee, { foreignKey: 'periodUsage_id', sourceKey: 'id' });
+db.PeriodUsage.hasMany(db.PeriodPowerFee, { foreignKey: 'periodUsage_id', sourceKey: 'id' });
 
 db.PeriodWireFee.belongsTo(db.PeriodUsage, { foreignKey: 'periodUsage_id', targetKey: 'id' });
 db.PeriodUsage.hasMany(db.PeriodWireFee, { foreignKey: 'periodUsage_id', sourceKey: 'id' });
