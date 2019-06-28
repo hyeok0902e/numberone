@@ -13,11 +13,11 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         unitCost: { // 단가
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         sumCost: { // 금액
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         createdAt: { // 생성 시간

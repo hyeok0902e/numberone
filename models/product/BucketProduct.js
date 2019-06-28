@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: false,
         },
         product_id: { // 제품 id
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: false,
         },
         createdAt: { // 생성 시간

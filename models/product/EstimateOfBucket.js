@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) => (
     sequelize.define('EstimateOfBucket', {
         customer_id: {
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: false,
         },
         name: { // 성함

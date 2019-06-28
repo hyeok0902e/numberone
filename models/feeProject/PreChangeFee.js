@@ -9,15 +9,15 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         basicCost: { // 기본요금
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         addCost: { // 추가요금
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         sum: { // 소계
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         createdAt: { // 생성 시간

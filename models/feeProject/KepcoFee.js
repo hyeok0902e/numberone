@@ -25,23 +25,23 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         basicCost: { // 기본시설부담금
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         distanceCost: { // 거리시설부담금
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         sum: { // 합계 비용
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         vat: { // 부가세
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         totalCost: { // 총 비용
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         createdAt: { // 생성 시간

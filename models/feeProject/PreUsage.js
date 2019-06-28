@@ -1,19 +1,19 @@
 module.exports = (sequelize, DataTypes) => (
     sequelize.define('PreUsage', { // 사용전 검사 수수료
         sum: { // 합계 비용
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         addCost: { // 할증료
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         vat: { // 부가세
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         totalCost: { // 총 비용 (수수료 비용)
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         offCheck: { // 야간, 공휴일, 토요일 검사 여부

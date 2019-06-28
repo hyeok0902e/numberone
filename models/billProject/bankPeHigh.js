@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => (
             defaultValue: 0,
         },
         volt: { // 전압 (V)
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
             defaultValue: 0,
         },

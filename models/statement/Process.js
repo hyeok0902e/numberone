@@ -5,15 +5,15 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: false,
         },
         materialCost: { // 재료비 합계
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         laborCost: { // 노무비 합계
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         operateCost: { // 경비 합계
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         createdAt: { // 생성 시간

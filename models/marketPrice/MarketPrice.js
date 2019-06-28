@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         period: {
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         createdAt: { // 생성 시간

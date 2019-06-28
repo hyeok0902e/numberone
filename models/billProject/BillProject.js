@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => (
         volt: { 
             // 총 전압: 각 부하의 가장 최상의 전압 => 변압기 or 계약전력 계산시 저장
             // 계약전력 계산 시 => 프로젝트 저압수전에 따라 규칙 다름
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         elecConvertVal: { // 계약전력 환산값 합계 - 계약전력 계산시 저장 (kW)

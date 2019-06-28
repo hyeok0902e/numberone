@@ -46,15 +46,15 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         totalCost: { // 합계 비용
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         vat: { // 부가세
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         lastCost: { // 총 비용
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         opinion: { // 특이 사항

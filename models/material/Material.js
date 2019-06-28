@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         organizePrice: {
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         organizePage: {
@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         dealPrice: {
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         dealPage: {
@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         sellPrice: {
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         sellPage: {
@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         marketPrice: {
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         marketPage: {
@@ -45,7 +45,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         searchPrice: {
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         searchPage: {
@@ -53,7 +53,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         minPrice: {
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         company: {

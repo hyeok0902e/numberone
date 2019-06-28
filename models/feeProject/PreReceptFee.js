@@ -17,19 +17,19 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         basicCost: { // 기본 요금
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         kwCost: { // kw 당 요금
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,   
         },
         supplyCost: { // 구내 배전료
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,    
         },
         sum: { // 총 비용 (소계)
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,  
         },
         createdAt: { // 생성 시간

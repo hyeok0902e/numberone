@@ -21,11 +21,11 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         sum: { // 합계
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         fee: { // 수수료
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: true,
         },
         weight: { // 가중치

@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: false,
         },
         price: {
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.BIGINT,
             allowNull: false,
         },
     }, {
