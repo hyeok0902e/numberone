@@ -4,8 +4,8 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.STRING(255),
             allowNull: false,
         },
-        dataFrom: { // 자료 선택 (출처)
-            type: DataTypes.BIGINT(2),
+        dataForm: { // 자료 선택 (출처)
+            type: DataTypes.INTEGER(2),
             allowNull: false,
         },
         tMaterialCost: { // 재료비 합
