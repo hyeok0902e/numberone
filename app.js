@@ -68,22 +68,26 @@ const safeManageRouter = require('./routes/feeProject/safeManage.js');
 // statement
 const statementRouter = require('./routes/statement/index.js');
 
+// jobSearch
+const hiringRouter = require('./routes/jobSearch/hiring.js');
+const seekingRouter = require('./routes/jobSearch/seeking.js'); 
+
 // product
 const productRouter = require("./routes/product/index.js");
 
 // organization
 const organizationRouter = require("./routes/organization/index.js");
 
-//material
+// material
 const materialRouter = require("./routes/material/index.js");
 
-//document
+// document
 const documentRouter = require("./routes/document/index.js")
 
-//marketPrice
+// marketPrice
 const marketPriceRouter = require("./routes/marketPrice/index.js")
 
-//admin
+// admin
 const manageUserRouter = require('./routes/admin/user.js')
 const manageAnnouncementRouter = require('./routes/admin/announcement.js')
 const manageDatabaseRouter = require('./routes/admin/database.js')
@@ -198,22 +202,26 @@ app.use('/fee/safeManage', safeManageRouter);
 // statement
 app.use('/statement', statementRouter);
 
+// jobSearch
+app.use('/hiring', hiringRouter);
+app.use('/seeking', seekingRouter);
+
 // Product
 app.use('/product', productRouter);
 
 // Organization 
 app.use('/organization', organizationRouter);
 
-//Material
+// Material
 app.use('/material', materialRouter);
 
-//Document
+// Document
 app.use('/document', documentRouter);
 
-//Market Price
+// Market Price
 app.use('/marketPrice', marketPriceRouter);
 
-//Admin
+// Admin
 app.use('/admin/user', manageUserRouter);
 app.use('/admin/announcement', manageAnnouncementRouter);
 app.use('/admin/database', manageDatabaseRouter);
