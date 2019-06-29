@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.STRING(255),
             allowNull: false,
         },
-        dataForm: { // 자료 선택 (출처)
+        dataFrom: { // 자료 선택 (출처)
             type: DataTypes.INTEGER(2),
             allowNull: false,
         },
@@ -141,7 +141,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         comment: {
-            type: DataTypes.BIGINT,
+            type: DataTypes.TEXT,
             allowNull: true,
         },
         createdAt: { // 생성 시간

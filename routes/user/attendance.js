@@ -5,7 +5,7 @@ const moment = require('moment');
 const { User, Attendance, Sequelize } = require('../../models');
 
 // 커스텀 미들웨어
-const { exUser, verifyToken, verifyUid } = require('../middlewares/main');
+const { verifyToken, verifyDuplicateLogin } = require('../middlewares/main');
 const { response } = require('../middlewares/response');
 
 // for findAll using range
@@ -14,23 +14,10 @@ const Op = Sequelize.Op;
 const router = express.Router(); 
 
 // 출석 체크
-router.post('/', verifyToken, async (req, res, next) => {
+router.post('/', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try { 
-        // 로그인 체크
-        if (!req.decoded) { responser(res, 400, "로그인 필요"); return; }
-
-        // 유저 존재여부 체크
-        if (!(await exUser(req.decoded.user_id))) {
-            response(res, 404, "유저 없음");
-            return;
-        }
-
         // 중복 로그인 체크
         const user = await User.findOne({ where: { id: user_id }});
-        if (!(await verifyUid(req.decoded.uuid, user.uuid))) {
-            response(res, 400, "중복 로그인"); 
-            return;
-        }
 
         // 금일 날짜
         const today = moment(Date.now()).format('YYYY-MM-DD');
