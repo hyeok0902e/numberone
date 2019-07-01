@@ -263,7 +263,7 @@ exports.verifyProductSeeAuth = async (req, res, next) => {
             response(res, 401, "장터 이용 권한이 없습니다");
         }
     }catch(err){
-        console.log(1111111);
+        console.log(err);
         response(res, 404, "서버에러");
     }
 }
@@ -281,7 +281,7 @@ exports.verifyJobSearchAuth = async (req, res, next) => {
             response(res, 401, "구인구직 이용 권한이 없습니다");
         }
     }catch(err){
-        response(res, 404, "서버에러");
+        response(res, 404, "서버에러");ß
     }
 }
 
