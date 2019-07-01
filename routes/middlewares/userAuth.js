@@ -104,9 +104,7 @@ exports.marketPriceAuth = async (user) => {
     }
 }
 
-
-////////유저를 넘기지 않고 자동으로 모든 권한을 체크하는 미들웨어입니다.
-
+//////// 유저를 넘기지 않고 자동으로 모든 권한을 체크하는 미들웨어입니다.
 
 // 업체관리 등록 권한
 exports.verifyCompAuth = async (req, res, next) => {
@@ -302,7 +300,7 @@ exports.verifyMarketPriceAuth = async (req, res, next) => {
     }
 }
 
-//회원의 이용권한을 변경하는 미들웨어
+// 회원의 이용권한을 변경하는 미들웨어
 exports.changeAuth = async(user, auth, info, res, next )=>{
     try{
         switch(info.level){
@@ -429,5 +427,6 @@ exports.changeAuth = async(user, auth, info, res, next )=>{
     }catch(err){
         response(res, 500, "서버에러");
     }
-
 }
+
+

@@ -1,5 +1,10 @@
 module.exports = (sequelize, DataTypes) => (
     sequelize.define('Statement', {
+        state: {
+            type: DataTypes.INTEGER(2), // 0: 상태 없음 or 처리 완료, 1: 자료 요청 처리중 
+            allowNull: true,
+            defaultValue: 0,
+        },
         name: { // 프로젝트 명
             type: DataTypes.STRING(255),
             allowNull: false,

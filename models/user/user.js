@@ -53,6 +53,7 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.STRING(2083),
             allowNull: true,
         },
+        // 0: 무료회원, 1: 개인회원1, 2: 개인회원2, 3: 개인회원3, 4: 개인회원4, 5: 기업회원, 9: 관리자
         level: { // 회원등급
             type: DataTypes.INTEGER(2),
             allowNull: false,

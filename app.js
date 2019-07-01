@@ -97,6 +97,8 @@ const manageDocumentRouter = require('./routes/admin/document.js')
 const manageProductRouter = require('./routes/admin/product.js')
 const manageJobSearchRouter = require('./routes/admin/jobSearch.js')
 const manageMarketPriceRouter = require('./routes/admin/marketPrice.js')
+const manageStatementRouter = require('./routes/admin/statement.js');
+
 /*********************** Router (End) ***********************/
 
 
@@ -231,6 +233,7 @@ app.use('/admin/document', manageDocumentRouter);
 app.use('/admin/product', manageProductRouter);
 app.use('/admin/jobSearch', manageJobSearchRouter);
 app.use('/admin/marketPrice', manageMarketPriceRouter);
+app.use('/admin/statement', manageStatementRouter);
 /*********************** Router URL (End) ***********************/
 
 

@@ -3,7 +3,8 @@ const express = require('express');
 // 모델 import
 const { 
     User, UserAuth, Statement,
-    Process, ProcessDetail, ProcessDetailElement
+    Process, ProcessDetail, ProcessDetailElement,
+    StatementAdmin,
 } = require('../../models');
 
 // 커스텀 미들웨어
@@ -123,8 +124,40 @@ router.post('/create', verifyToken, verifyStatementAuth, verifyDuplicateLogin, a
     }
 });
 
+// 목록에서 추가 
+router.get('/processDetailElement', verifyToken, verifyDuplicateLogin, verifyStatementAuth, async (req, res, next) => {
+    try {
+        let elements = await StatementAdmin.findAll();
+        let payLoad = { elements };
+        response(res, 200, "세부 공종 엘리먼트 목록 반환", payLoad);
+    } catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러");
+    } 
+});
+
 // 수정 => 기존 데이터 삭제
 
+// 자료 요청
+router.post('/:statement_id/call', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
+    try {
+        const { statement_id } = req.params;
+        if (!statement_id) { response(res, 400, "params값 없음"); return; }
+
+        let statement = await Statement.findOne({ where: { id: statement_id } });
+        if (!statement) { response(res, 404, "내역서가 존재하지 않습니다."); return; }
+
+        await Statement.update(
+            { state: 1 },
+            { where: { id: statement_id } }
+        );
+
+        response(res, 200, "자료요청 완료")
+    } catch (err) {
+        console.log(err);
+        response(res, 500, "서버 에러");
+    }
+});
 
 // 삭제
 router.delete('/destroy', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
