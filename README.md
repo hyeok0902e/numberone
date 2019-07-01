@@ -184,6 +184,10 @@
 - statement
     - index.js
 
+### 2019.07.01(월)
+#### router
+
+
 ## 해결해야 할 오류 & 이슈
 - [해결완료] routes/product/product.js => create에서 product의 productOpt와 productThumb값을 받아오지 못함.
 ### 일반부하(분전반) 생성 및 집계시 (06.02)

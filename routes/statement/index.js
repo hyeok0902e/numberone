@@ -143,4 +143,12 @@ router.delete('/destroy', verifyToken, verifyDuplicateLogin, async (req, res, ne
         response(res, 500, "서버 에러");
     }
 });
+
+// test
+router.get('/test', async (req, res, next) => {
+    const f = await Statement.findOne();
+    const payLoad =  { f }
+    response(res, 200, "test", payLoad);
+})
+
 module.exports = router;

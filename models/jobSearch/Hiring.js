@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.TEXT,
             allowNull: true,
         },
-        isSelected: { // 선택 여부 파악
+        isSelected: { // 선택 여부 파악 => 0: 진행중, 1: 마감
             type: DataTypes.TINYINT(1),
             allowNull: false,
             defaultValue: 0,
