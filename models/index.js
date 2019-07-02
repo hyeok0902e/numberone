@@ -107,9 +107,9 @@ db.User.hasOne(db.Address, { foreignKey: 'user_id', sourceKey: 'id' });
 db.UserAuth.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
 db.User.hasOne(db.UserAuth, { foreignKey: 'user_id', sourceKey: 'id' });
 
-// Announcement
-db.Announcement.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
-db.User.hasMany(db.Announcement, { foreignKey: 'user_id', sourceKey: 'id' });
+// // Announcement // 유저와 공지는 연결될 필요가 없으므로 삭제함
+// db.Announcement.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
+// db.User.hasMany(db.Announcement, { foreignKey: 'user_id', sourceKey: 'id' });
 
 
 /**************************** Relation About User (End) ****************************/
@@ -289,8 +289,10 @@ db.Seeking.hasMany(db.Labor, { foreignKey: 'seeking_id', sourceKey: 'id' });
 
 
 /************************** Relation About Product (Start) **************************/
-db.Product.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
-db.User.hasMany(db.Product, { foreignKey: 'user_id', sourceKey: 'id' });
+// db.Product.belongsTo(db.User, { foreignKey: 'user_id', targetKey: 'id' });
+// db.User.hasMany(db.Product, { foreignKey: 'user_id', sourceKey: 'id' });
+// 제품은 관리자로부터 등록되나 둘이 연관되어 있는 개념이 아니므로 관계설정을 삭제함
+
 
 db.ProductThumb.belongsTo(db.Product, { foreignKey: 'product_id', targetKey: 'id' });
 db.Product.hasMany(db.ProductThumb, { foreignKey: 'product_id', sourceKey: 'id' });
