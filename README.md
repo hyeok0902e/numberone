@@ -158,6 +158,17 @@
 - company/rayPaper - 수정, 수정페이지, 상세보기, 목록, 생성, 복사
 - company/testPaper - 목록, 생성
 
+### 2019.06.25(화)
+#### router
+- 사업소 완료
+- 자재검색 완료
+- 자료실 완료
+- 전기 장처 완료
+- 시세정보 완료
+- 관리자 페이지 진입 (유저, 공지, 기관정보, 자재 완료 )
+- 관리자 페이지 Document 부터 추가 진행
+
+
 ### 2019.06.26(수)
 #### router
 - company
@@ -184,9 +195,12 @@
 - statement
     - index.js
 
+<<<<<<< HEAD
 ### 2019.07.01(월)
 #### router
 
+=======
+>>>>>>> 6928ec0f9b8ab479abaf56f53f66725ab6ff2992
 
 ## 해결해야 할 오류 & 이슈
 - [해결완료] routes/product/product.js => create에서 product의 productOpt와 productThumb값을 받아오지 못함.

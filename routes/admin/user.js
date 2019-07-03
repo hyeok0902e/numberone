@@ -5,7 +5,7 @@ const {  User, Attendance, UserAuth, UserPick} = require('../../models');
 
 // 커스텀 미들웨어
 const { response } = require('../middlewares/response');
-const { verifyToken, asyncForEach, verifyDuplicateLogin } = require('../middlewares/main');
+const { verifyToken, verifyDuplicateLogin } = require('../middlewares/main');
 const { verifyIsAdmin } = require('../middlewares/adminAuth');
 const { changeAuth } = require('../middlewares/userAuth')
 

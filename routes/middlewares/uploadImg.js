@@ -52,11 +52,27 @@ exports.uploadImg_rayPaper = multer({
 });
 
 
-// 프로필
-exports.uploadImg_profile = multer({
+// 다큐먼트
+exports.uploadDocument = multer({
     storage: multerS3({
         s3: s3,
-        bucket: "numberone-s3-documents",
+        bucket: "numberone-s3-userinfo/documents",
+        contentType: multerS3.AUTO_CONTENT_TYPE, 
+        acl: 'public-read',
+        key: (req, file, cb) => {
+            console.log(file);
+            console.log(cb);
+            cb(null, file.originalname)
+        },
+    }),
+});
+
+
+// 다큐먼트
+exports.uploadProductImg = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: "numberone-s3-userinfo/products",
         contentType: multerS3.AUTO_CONTENT_TYPE, 
         acl: 'public-read',
         key: (req, file, cb) => {
