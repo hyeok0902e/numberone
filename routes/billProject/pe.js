@@ -35,7 +35,7 @@ router.post('/high/create', verifyToken, async (req, res, next) => {
 
         // 이미 수전설비가 설정되었는지 체크
         let check = await reBillProject.getMainPE_High();
-        if (check) { response(res, 400, "이미 수전설비가 설정되어 있습니다."); return; }
+        // if (check) { response(res, 400, "이미 수전설비가 설정되어 있습니다."); return; }
 
         // 전체 수전설비 생성
         const mainPE = await MainPE_High.create({
@@ -53,7 +53,7 @@ router.post('/high/create', verifyToken, async (req, res, next) => {
 
             // 이미 수전설비가 설정되었는지 체크
             let check = await reBank.getBankPE_High();
-            if (check) { response(res, 400, "이미 수전설비가 설정되어 있습니다."); return; }
+            // if (check) { response(res, 400, "이미 수전설비가 설정되어 있습니다."); return; }
             
             let bankPE = await BankPE_High.create({
                 pfTrans: bank.bankPe.pfTrans, pfNonTrans: bank.bankPe.pfNonTrans,
@@ -136,7 +136,7 @@ router.post('/low/create', verifyToken, async (req, res, next) => {
  
         // 이미 수전설비가 설정되었는지 체크
         let check = await reBillProject.getPE_Low();
-        if (check) { response(res, 400, "이미 수전설비가 설정되어 있습니다."); return; }
+        // if (check) { response(res, 400, "이미 수전설비가 설정되어 있습니다."); return; }
         
         // 전체 수전설비 생성
         const mainPE = await PE_Low.create({

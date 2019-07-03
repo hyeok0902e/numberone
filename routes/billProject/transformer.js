@@ -72,6 +72,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
         // 변압기 생성
         await asyncForEach(billProject.Loads, async (transformer) => {
             let bank = await Load.findOne({ where: { id: transformer.id, type: 0 } });
+            if (!bank) { response(res, 404, "뱅크가 존재하지 않습니다."); return; }
 
             // 이미 변압기가 설정되었는지 체크
             let checkTransformer = await bank.getTransformer();
@@ -87,19 +88,28 @@ router.post('/create', verifyToken, async (req, res, next) => {
                 secPs: transformer.secPs, 
                 firstVal: transformer.firstVal, secVal: transformer.secVal, 
                 userVal: transformer.userVal, voltDropVal: transformer.voltDropVal
-            });
-            transformerKva += transformer.userVal;
+            }); 
             await bank.setTransformer(reTransformer); // 1:1 관계
-
             // 차단기 계산 시 사용할 뱅크의 전류b` 값 계산 및 업데이트
             let bankAmpeB = transformer.userVal / (Math.sqrt(3) * bank.volt / 1000) * 1.2;
             if (bankAmpeB == Infinity) { bankAmpeB = 0; }
-            if (transformer.userVal = 0) { bankAmpeB = 0; }
+            if (transformer.userVal == 0) { bankAmpeB = 0; }
+            if (!transformer.userVal) { 
+                bankAmpeB = 0; 
+            } else {
+                console.log(transformer.userVal);
+                transformerKva += transformer.userVal;
+            }
             await Load.update({ ampeB: bankAmpeB }, { where: { id: bank.id, type: 0 } });
         });
         
         // 프로젝트 DB에 변압기 전체 용량 저장
-        await BillProject.update({ transformerKva, volt: 22900, step: "transformer" }, { where: { id: billProject.id } });
+        await BillProject.update(
+            { 
+                transformerKva, volt: 22900, step: "transformer" 
+            }, 
+            { where: { id: billProject.id } }
+        );
 
         // 데이터 준비 => 계약전력
         let resBillProject = await BillProject.findOne({

@@ -99,6 +99,13 @@ const manageJobSearchRouter = require('./routes/admin/jobSearch.js')
 const manageMarketPriceRouter = require('./routes/admin/marketPrice.js')
 const manageStatementRouter = require('./routes/admin/statement.js');
 
+// myPage
+const myPageJobSearchRouter = require('./routes/myPage/jobSearch.js');
+const myPageAuthRouter = require('./routes/myPage/auth.js');
+const myPageNoticeRouter = require('./routes/myPage/notice.js');
+const myPageAttendanceRouter = require('./routes/myPage/attendance.js');
+const myPageApplyPaidRouter = require('./routes/myPage/applyPaid.js');
+
 /*********************** Router (End) ***********************/
 
 
@@ -111,7 +118,7 @@ moment.tz.setDefault("Asia/Seoul"); // 시간대 설정
 
 
 /********************* Udate UserAuht - Period (Start) *********************/
-const { UserAuth } = require('./models');
+const { UserAuth, User } = require('./models');
 schedule.scheduleJob('0 0 0 */1 * *', async () => {       
     const userAuths = await UserAuth.findAll();
     await userAuths.forEach(async (ua) => {
@@ -126,6 +133,12 @@ schedule.scheduleJob('0 0 0 */1 * *', async () => {
             ua.product = 0;
             ua.jobSearch = 0;
             ua.marketPrice = 0;
+            await User.update(
+                {
+                    level: 0,
+                },
+                { where: { id: ua.user_id } }
+            );
         }
     }); 
     console.log('a')
@@ -234,6 +247,14 @@ app.use('/admin/product', manageProductRouter);
 app.use('/admin/jobSearch', manageJobSearchRouter);
 app.use('/admin/marketPrice', manageMarketPriceRouter);
 app.use('/admin/statement', manageStatementRouter);
+
+// MyPqge
+app.use('/myPage/jobSearch', myPageJobSearchRouter);
+app.use('/myPage/auth', myPageAuthRouter);
+app.use('/myPage/notice', myPageNoticeRouter);
+app.use('/myPage/attendance', myPageAttendanceRouter);
+app.use('/myPage/applyPaid', myPageApplyPaidRouter);
+
 /*********************** Router URL (End) ***********************/
 
 

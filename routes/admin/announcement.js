@@ -14,7 +14,7 @@ const router = express.Router();
 //공지를 등록하는 라우터
 router.post('/', verifyToken, verifyDuplicateLogin, verifyIsAdmin, async (req, res, next)=>{
     try{
-        let {info} = req.body;
+        let { info } = req.body;
 
         let announcement = await Announcement.create({
             title: info.title,
@@ -128,9 +128,5 @@ router.get('/edit/:id', verifyToken, verifyDuplicateLogin, verifyIsAdmin, async 
         response(res, 500, "서버 에러")
     }
 });
-
-
-
-
 
 module.exports = router;

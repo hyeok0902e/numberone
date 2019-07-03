@@ -203,8 +203,14 @@ router.post('/:hiring_id/participate', verifyToken, verifyDuplicateLogin, async 
             await resHiring.addLabor(labor);
         });
 
+        // 문자메세지 전송 구현
+        //
+        //
+        //
+        //
+
         let payLoad = { hiring: resHiring };
-        response(res, 201, "구인 참여신청 완료 - 내 참여신청 목록 페이지로 이동", payLoad);
+        response(res, 201, "구인 참여신청(SNS 전송) 완료 - 내 참여신청 목록 페이지로 이동", payLoad);
         
     } catch (err) {
         console.log(err);
