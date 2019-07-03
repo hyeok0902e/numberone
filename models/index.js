@@ -285,6 +285,28 @@ db.Hiring.hasMany(db.Labor, { foreignKey: 'hiring_id', sourceKey: 'id' });
 
 db.Labor.belongsTo(db.Seeking, { foreignKey: 'seeking_id', targetKey: 'id' });
 db.Seeking.hasMany(db.Labor, { foreignKey: 'seeking_id', sourceKey: 'id' });
+
+// N:N
+db.Hiring.belongsToMany(db.Hiring, { 
+    foreignKey: 'applying_id', 
+    as: "Applying",
+    through: "ApplyHiring"
+});
+db.Hiring.belongsToMany(db.Hiring, { 
+    foreignKey: 'applyer_id',  
+    as: "Applier",
+    through: "ApplyHiring" 
+});
+db.Seeking.belongsToMany(db.Seeking, { 
+    foreignKey: 'applying_id', 
+    as: "Applying",
+    through: "ApplySeeking"
+});
+db.Seeking.belongsToMany(db.Seeking, { 
+    foreignKey: 'applyer_id',  
+    as: "Applier",
+    through: "ApplySeeking" 
+});
 /************************* Relation About JobSearch (End) *************************/
 
 
