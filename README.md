@@ -168,7 +168,6 @@
 - 관리자 페이지 진입 (유저, 공지, 기관정보, 자재 완료 )
 - 관리자 페이지 Document 부터 추가 진행
 
-
 ### 2019.06.26(수)
 #### router
 - company
@@ -195,22 +194,30 @@
 - statement
     - index.js
 
-<<<<<<< HEAD
-### 2019.07.01(월)
+### 2019.07.03(수)
 #### router
+- jobSearch
+    - hiring.js
+    - seeknig.js
+- myPage
+    - auth.js
+    - notice.js
+- 네이버 sms 연동
 
-=======
->>>>>>> 6928ec0f9b8ab479abaf56f53f66725ab6ff2992
+### 2019.07.04(목)
+#### router
+- myPage
+    - seekingParti
+    - hiringParti
 
 ## 해결해야 할 오류 & 이슈
 - [해결완료] routes/product/product.js => create에서 product의 productOpt와 productThumb값을 받아오지 못함.
 ### 일반부하(분전반) 생성 및 집계시 (06.02)
-- 일반부하(분전반)의 합계 부하를 어떻게 구분할 것인지? 
+- [해결완료] 일반부하(분전반)의 합계 부하를 어떻게 구분할 것인지? 
     - 사용자 인터페이스 수정(보완)이 필요해 보임
     - 대표님과 상의할것: 최대한 빨리
         - 질문1: 3상4선 혹은 1상2선을 선택할 때 추가할 수 있는 분전반의 갯수가 제한이 있는지 (3상4선일 경우 4개, 1상 2선일 경우 3개)
             - 해결 완료 => 갯수 제한 없음(자유로움) 단 상/구분 선택시 상위 분전반 Row의 이름 Save => 최종 완료 버튼 클릭 시 상위 분전반 Row 데이터 업데이트
-
 
 ## ToDo
 - [완료] 회원가입 라우터 => 이미 가입한 사용자(이메일 중복)인지 체크하는 기능 추가
@@ -220,16 +227,16 @@
 - [완료] JWT Token & CleintSecret(uuid) 사용하여 로그인 인증/보안 구축
     - uuid => const uuidv4 = require('uuid/v4'); => node 교과서 411p
 - [완료] 모든 라우터에 verifyToken, verifyUid 미들웨어 적용하기
+- [완료] 미들웨어 교체 - 간편하게
 - sequelize Pagenation
 - casecade(db) 설정 - 종속 삭제
-- 미들웨어 교체 - 간편하게
 
-## 모델생성 및 관계세팅 진행률
+## [완료] 모델생성 및 관계세팅 진행률
 - company & paper - 100%
-- billProject - 90% => 점검 1회 필요
+- billProject - 100% => 점검 1회 필요
 - feeProject - 100%
 - statement - 100%
-- jobSearch - 90% => 관계부분 좀 더 고민해 볼 것 (등록글 - 신청글)
+- jobSearch - 100% => 관계부분 좀 더 고민해 볼 것 (등록글 - 신청글)
 - Announcement - 100%
 - Material - 100%
 - Organization - 100%

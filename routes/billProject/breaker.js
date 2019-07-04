@@ -31,7 +31,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
         // 뱅크부
         await asyncForEach(billProject.Loads, async (bank) => {
             const reBank = await Load.findOne({ where: { id: bank.id, type: 0 } });
-            
+            if (!reBank) { response(res, 404, "부하가 존재하지 않습니다."); return; }
             // 이미 차단기가 설정되었는지 체크
             let checkBreaker = await reBank.getBreaker();
             // if (checkBreaker) { response(res, 400, "이미 차단기가 설정되어 있습니다."); return; }
@@ -48,7 +48,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
             // 그룹부
             await asyncForEach(bank.Group, async (group) => {
                 let reGroup = await Load.findOne({ where: { id: group.id, type: 1 } });
-
+                if (!reGroup) { response(res, 404, "부하가 존재하지 않습니다."); return; }
                 // 이미 차단기가 설정되었는지 체크
                 let checkBreaker = await reGroup.getBreaker();
                 // if (checkBreaker) { response(res, 400, "이미 차단기가 설정되어 있습니다."); return; }
@@ -64,7 +64,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                 // 전동기부하
                 await asyncForEach(group.MotorLoad, async (load) => {
                     let reLoad = await Load.findOne({ where: { id: load.id } });
-
+                    if (!reLoad) { response(res, 404, "부하가 존재하지 않습니다."); return; }
                     // 이미 차단기가 설정되었는지 체크
                     let checkBreaker = await reLoad.getBreaker();
                     // if (checkBreaker) { response(res, 400, "이미 차단기가 설정되어 있습니다."); return; }

@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');
 
 // 모델 import
 const { 
@@ -17,8 +18,8 @@ router.get('/', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
         const hirings = await Hiring.findAll({
-            where: { user_id: user.id, type: 0, },
-            attributes: ['id', 'company', 'address', 'startDate', 'isSelected'],
+            where: { type: 0, },
+            attributes: ['id', 'type', 'company', 'address', 'startDate', 'endDate', 'isSelected'],
             order: [['id', 'DESC']],   
             include: [
                 {
@@ -186,6 +187,8 @@ router.post('/:hiring_id/participate', verifyToken, verifyDuplicateLogin, async 
     try {
         const { hiring } = req.body;
         if (!hiring) { response(res, 400, "데이터 없음"); return; }
+        const { hiring_id } = req.params;
+        if (!hiring_id) { response(res, 400, "params값 없음"); return; }
 
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
 
@@ -203,14 +206,38 @@ router.post('/:hiring_id/participate', verifyToken, verifyDuplicateLogin, async 
             await resHiring.addLabor(labor);
         });
 
+        // 관계설정
+        let exHiring = await Hiring.findOne({ where: { id: hiring_id } });
+        if (!exHiring) { response(res, 404, "구인 정보가 존재하지 않습니다."); return; }
+        await exHiring.addApplying(resHiring);
+
         // 문자메세지 전송 구현
-        //
-        //
-        //
-        //
+        let message = user.name + "[" + user.email + "]님이 " + resHiring.company + " 업체에 대해 구인 신청을 하였습니다. / Tel: " + user.phone;   
+        await axios.post(
+            'https://api-sens.ncloud.com/v1/sms/services/ncp:sms:kr:256360784020:numberone/messages',
+            {
+                "type":"LMS",
+                "contentType":"COMM",
+                "countryCode":"82",
+                "from":"01022364829",
+                "to": ['01022364829'],
+                "content": message
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'x-ncp-auth-key': 'aknAO0c9oVle5No8A4yC',
+                    'X-NCP-service-secret': 'b063dccf18b7426fa692b3405d93481d',         
+                }
+            }
+        ).then((res) => {
+            console.log(res);
+        }).catch((err) => {
+            console.log(err);
+        });
 
         let payLoad = { hiring: resHiring };
-        response(res, 201, "구인 참여신청(SNS 전송) 완료 - 내 참여신청 목록 페이지로 이동", payLoad);
+        response(res, 201, "구인 참여신청(SNS 전송) 완료 - 내 참여신청 목록 페이지로 이동");
         
     } catch (err) {
         console.log(err);

@@ -40,12 +40,12 @@ module.exports = (sequelize, DataTypes) => (
             defaultValue: 0,
         },
         breakerVal: { // 차단기 선정 값 => 고압차단기 일 시 1을 저장
-            type: DataTypes.DOUBLE(11, 2),
+            type: DataTypes.STRING,
             allowNull: true,
             defaultValue: 0,
         },
         userVal: { // 사용자 선정 값
-            type: DataTypes.DOUBLE(11, 2),
+            type: DataTypes.STRING,
             allowNull: true,
             defaultValue: 0,
         },

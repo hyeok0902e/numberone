@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');
 
 // 모델 import
 const { 
@@ -17,8 +18,8 @@ router.get('/', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
     try {
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
         const seekings = await Seeking.findAll({
-            where: { user_id: user.id, type: 0, },
-            attributes: ['id', 'company', 'address', 'car', 'career'],
+            where: { type: 0, },
+            attributes: ['id', 'tpye', 'company', 'address', 'car', 'career', 'isSelected'],
             order: [['id', 'DESC']],   
             include: [
                 {
@@ -60,8 +61,6 @@ router.get('/:seeking_id/show', verifyToken, verifyDuplicateLogin, async (req, r
         response(res, 500, "서버 에러");
     }
 });
-
-// 참여신청
 
 // 구직 등록
 router.post('/create', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
@@ -188,13 +187,15 @@ router.post('/:seeking_id/participate', verifyToken, verifyDuplicateLogin, async
     try {
         const { seeking } = req.body;
         if (!seeking) { response(res, 400, "데이터 없음"); return; }
-
+        const { seeking_id } = req.params;
+        if (!seeking_id) { response(res, 400, "params값 없음"); return; }
+                          
         const user = await User.findOne({ where: { id: req.decoded.user_id } });
 
         let a = seeking;
         let resSeeking = await Seeking.create({
             type: 1, company: a.company, address: a.address, 
-            startDate: a.startDate, endDate: a.endDate, description: a.description,
+            car: a.car, career: a.career, description: a.description,
             isSelected: 0,
         })
         await user.addSeeking(resSeeking);
@@ -205,15 +206,37 @@ router.post('/:seeking_id/participate', verifyToken, verifyDuplicateLogin, async
             await resSeeking.addLabor(labor);
         });
 
-        // 문자메세지 전송 구현
-        //
-        //
-        //
-        //
+        // 관계설정
+        let exSeeking = await Seeking.findOne({ where: { id: seeking_id } });
+        if (!exSeeking) { response(res, 404, "구직 정보가 존재하지 않습니다."); return; }
+        await exSeeking.addApplying(resSeeking);
 
-        
+        // 문자메세지 전송 구현
+        let message = user.name + "[" + user.email + "]님이 " + resSeeking.company + " 업체에 대해 구직 신청을 하였습니다. / Tel: " + user.phone;   
+        await axios.post(
+            'https://api-sens.ncloud.com/v1/sms/services/ncp:sms:kr:256360784020:numberone/messages',
+            {
+                "type":"LMS",
+                "contentType":"COMM",
+                "countryCode":"82",
+                "from":"01022364829",
+                "to": ['01022364829'],
+                "content": message
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'x-ncp-auth-key': 'aknAO0c9oVle5No8A4yC',
+                    'X-NCP-service-secret': 'b063dccf18b7426fa692b3405d93481d',         
+                }
+            }
+        ).then((res) => {
+            console.log(res);
+        }).catch((err) => {
+            console.log(err);
+        });
+
         response(res, 201, "구직 참여신청(SNS 전송) 완료 - 내 참여신청 목록 페이지로 이동");
-        
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");
