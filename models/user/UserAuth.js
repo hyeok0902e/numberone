@@ -54,7 +54,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: false,
             defaultValue: 0,
         },
-        jobSearch: { // 
+        jobSearch: { 
             type: DataTypes.TINYINT(1),
             allowNull: false,
             defaultValue: 0,
