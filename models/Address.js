@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => (
-    sequelize.define('address', {
+    sequelize.define('Address', {
         jibunAddr: {
             type: DataTypes.STRING(255),
             allowNull: true,
