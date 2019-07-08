@@ -9,7 +9,7 @@ db.Sequelize = Sequelize;
 
 /******************************** Initialize (Start) ********************************/
 // 공통 및 기타
-db.Address = require('./address.js')(sequelize, Sequelize);
+db.Address = require('./address')(sequelize, Sequelize);
 db.Announcement = require('./announcement')(sequelize, Sequelize);
 // 관리자
 db.StatementAdmin = require('./admin/statementAdmin')(sequelize, Sequelize);
