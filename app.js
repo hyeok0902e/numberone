@@ -107,6 +107,7 @@ const myPageApplyPaidRouter = require('./routes/myPage/applyPaid.js');
 const myPageJobSearchRouter = require('./routes/myPage/jobSearch.js');
 const myPageHiringPartiRouter = require('./routes/myPage/hiringParti.js');
 const myPageSeekingPartiRouter = require('./routes/myPage/seekingParti.js');
+const myPageBucketRouter = require('./routes/myPage/bucket.js');
 
 /*********************** Router (End) ***********************/
 
@@ -258,6 +259,7 @@ app.use('/myPage/applyPaid', myPageApplyPaidRouter);
 app.use('/myPage/jobSearch', myPageJobSearchRouter);
 app.use('/myPage/hiringParti', myPageHiringPartiRouter);
 app.use('/myPage/seekingParti', myPageSeekingPartiRouter);
+app.use('/myPage/bucket', myPageBucketRouter);
 
 /*********************** Router URL (End) ***********************/
 

@@ -1,9 +1,5 @@
 module.exports = (sequelize, DataTypes) => (
-    sequelize.define('EstimateOfBucket', {
-        customer_id: {
-            type: DataTypes.BIGINT,
-            allowNull: false,
-        },
+    sequelize.define('ProductEstimate', {
         name: { // 성함
             type: DataTypes.STRING(45),
             allowNull: false,
@@ -12,13 +8,22 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.STRING(512),
             allowNull: false,
         },
-        tel: { // 연락처
+        mobile: { // 연락처
             type: DataTypes.STRING(45),
             allowNull: false
         },
         email: { // 이메일
             type: DataTypes.STRING(255),
             allowNull: false,
+        },
+        createdAt: { // 생성 시간
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+        },
+        updatedAt: { // 업데이트 시간
+            type: DataTypes.DATE,
+            allowNull: true, 
         },
     }, {
         timestamps: false,

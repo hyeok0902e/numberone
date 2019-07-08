@@ -151,8 +151,33 @@ router.post('/:statement_id/call', verifyToken, verifyDuplicateLogin, async (req
             { state: 1 },
             { where: { id: statement_id } }
         );
+        let user = await User.findOne({ where: { id: req.decoded.user_id } });
 
-        response(res, 200, "자료요청 완료")
+        // 메세지 전송
+        let message = user.name + "(" + user.email + "/" + user.phone + ")님이 내역서 자료요청을 하였습니다. 요청한 내역서 명은 [" + statement.name + "] 입니다."
+        await axios.post(
+            'https://api-sens.ncloud.com/v1/sms/services/ncp:sms:kr:256360784020:numberone/messages',
+            {
+                "type":"LMS",
+                "contentType":"COMM",
+                "countryCode":"82",
+                "from":"01090075064",
+                "to": ["01090075064"],
+                "content": message
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'x-ncp-auth-key': 'aknAO0c9oVle5No8A4yC',
+                    'X-NCP-service-secret': 'b063dccf18b7426fa692b3405d93481d',         
+                }
+            }
+        ).then((res) => {
+            response(res, 200, "자료요청 완료")
+        }).catch((err) => {
+            console.log(err);
+            response(res, 400, "문자 메세지 전송오류");
+        });  
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");

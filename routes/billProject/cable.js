@@ -109,7 +109,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                             include: [
                                 {
                                     model: Cable,
-                                    attributes: ['cableThick']
+                                    attributes: ['groundWire']
                                 },
                                 {
                                     model: Load,
@@ -120,7 +120,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                                     include: [
                                         {
                                             model: Cable,
-                                            attributes: ['cableThick']
+                                            attributes: ['groundWire']
                                         },
                                     ]
                                 },
@@ -133,7 +133,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
                                     include: [
                                         {
                                             model: Cable,
-                                            attributes: ['cableThick']
+                                            attributes: ['groundWire']
                                         },
                                     ]
                                 }

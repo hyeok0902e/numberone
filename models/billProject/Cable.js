@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => (
             defaultValue: 0,
         },
         workType: { // 공사방법
-            type: DataTypes.INTEGER(2),
+            type: DataTypes.STRING(45),
             allowNull: true,
         },
         temp: { // 온도감소 - 온도 (℃)
@@ -86,7 +86,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         },
         lastValRef: {
-            type: DataTypes.INTEGER(11),
+            type: DataTypes.STRING(45),
             allowNull: true,
         },
         userVolt: { // 사용자 선정 - 전압강하 V (V)

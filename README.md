@@ -210,6 +210,15 @@
     - seekingParti
     - hiringParti
 
+### 2019.07.05(금)
+#### DB
+- cascade 적용
+#### routes
+- admin
+    - jobSearch
+    - database
+- app.js
+
 ## 해결해야 할 오류 & 이슈
 - [해결완료] routes/product/product.js => create에서 product의 productOpt와 productThumb값을 받아오지 못함.
 ### 일반부하(분전반) 생성 및 집계시 (06.02)
@@ -229,7 +238,7 @@
 - [완료] 모든 라우터에 verifyToken, verifyUid 미들웨어 적용하기
 - [완료] 미들웨어 교체 - 간편하게
 - sequelize Pagenation
-- casecade(db) 설정 - 종속 삭제
+- [완료] casecade(db) 설정 - 종속 삭제
 
 ## [완료] 모델생성 및 관계세팅 진행률
 - company & paper - 100%

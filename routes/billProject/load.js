@@ -37,7 +37,8 @@ router.post('/create', verifyToken, async(req, res, next) => {
 
         // 계산서 생성
         const newBillProject = await BillProject.create({ voltType, name: billProjectName, step: 0 })
-
+        await user.addBillProject(newBillProject);
+        
         // 부하 생성
         // 뱅크부
         await asyncForEach(bank, async (bank) =>{

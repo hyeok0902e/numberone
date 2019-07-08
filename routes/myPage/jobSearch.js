@@ -24,7 +24,7 @@ router.get('/hiring', verifyToken, verifyDuplicateLogin, async (req, res, next) 
                 {
                     model: Labor,
                     order: [['id', 'ASC']], 
-                    limit: 1,
+                    limit: 2,
                 }
             ]
         });

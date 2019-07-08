@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt'); // 비밀번호 암호화 모듈
 const jwt = require('jsonwebtoken');
 const uuidv4 = require('uuid/v4');
+const axios = require('axios');
 
 // 모델 import
 const { User, UserPick, UserAuth, Address } = require('../../models'); // address 추가 필요
@@ -48,18 +49,34 @@ router.post('/', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
         }
         let user = User.findOne({ where: { id: req.decoded.user_id } });
         let message = 
-            user.name + "(" + user.email + ") 님이 신청한 유료회원 등급은 "
+            user.name + "(" + user.email + ") 님이 신청한 유료회원 신청을 하였습니다. 신청등급은 "
             + "[" + levelTxt + "] 입니다."
             
-        // SMS 전송 구현하기
-        //
-        //
-        //
-        //
-        //
-        //
-
-        
+        // 문자메세지 전송 구현
+        await axios.post(
+            'https://api-sens.ncloud.com/v1/sms/services/ncp:sms:kr:256360784020:numberone/messages',
+            {
+                "type":"LMS",
+                "contentType":"COMM",
+                "countryCode":"82",
+                "from":"01090075064",
+                "to": ["01090075064"],
+                "content": message
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'x-ncp-auth-key': 'aknAO0c9oVle5No8A4yC',
+                    'X-NCP-service-secret': 'b063dccf18b7426fa692b3405d93481d',         
+                }
+            }
+        ).then((res) => {
+            console.log(res);
+            response(res, 200, "신청 완료")
+        }).catch((err) => {
+            console.log(err);
+            response(res, 400, "문자 메세지 전송오류");
+        });
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");

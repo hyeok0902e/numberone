@@ -8,14 +8,17 @@ module.exports = (sequelize, DataTypes) => (
         volt: { // 전압 (V)
             type: DataTypes.INTEGER(11),
             allowNull: true,
+            defaultValue: 0,
         },
         meterCapa: { // 계량기 - 용량 (A)
             type: DataTypes.INTEGER(11),
             allowNull: true,
+            defaultValue: 0,
         },
         meterCTCapa: { // 계량기 - CT용량 (A)
             type: DataTypes.STRING(45),
             allowNull: true,
+            defaultValue: 0,
         },
         meterCase: { // 계량기함
             type: DataTypes.STRING(45),

@@ -31,7 +31,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
             await asyncForEach(load.Group, async (load) => {
                 let reLoad = await Load.findOne({ where: { id: load.id } });
                 let tray = await Tray.create({
-                    sum: load.sum, convertVal: load.convertVal, taryVal: load.taryVal,
+                    sum: load.sum, convertVal: load.convertVal, trayVal: load.trayVal,
                 })
                 await reLoad.setTray(tray);
             });

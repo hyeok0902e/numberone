@@ -25,7 +25,7 @@ router.get('/', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
                 {
                     model: Labor,
                     order: [['id', 'ASC']], 
-                    limit: 1,
+                    limit: 2,
                 }
             ]
         });
@@ -212,6 +212,7 @@ router.post('/:hiring_id/participate', verifyToken, verifyDuplicateLogin, async 
         await exHiring.addApplying(resHiring);
 
         // 문자메세지 전송 구현
+        let phoneNum = user.phone;
         let message = user.name + "[" + user.email + "]님이 " + resHiring.company + " 업체에 대해 구인 신청을 하였습니다. / Tel: " + user.phone;   
         await axios.post(
             'https://api-sens.ncloud.com/v1/sms/services/ncp:sms:kr:256360784020:numberone/messages',
@@ -219,8 +220,8 @@ router.post('/:hiring_id/participate', verifyToken, verifyDuplicateLogin, async 
                 "type":"LMS",
                 "contentType":"COMM",
                 "countryCode":"82",
-                "from":"01022364829",
-                "to": ['01022364829'],
+                "from":"01090075064",
+                "to": [phoneNum],
                 "content": message
             },
             {
@@ -231,14 +232,12 @@ router.post('/:hiring_id/participate', verifyToken, verifyDuplicateLogin, async 
                 }
             }
         ).then((res) => {
-            console.log(res);
+            let payLoad = { hiring: resHiring };
+            response(res, 201, "구인 참여신청(SNS 전송) 완료 - 내 참여신청 목록 페이지로 이동");
         }).catch((err) => {
             console.log(err);
+            response(res, 400, "문자 메세지 전송오류");
         });
-
-        let payLoad = { hiring: resHiring };
-        response(res, 201, "구인 참여신청(SNS 전송) 완료 - 내 참여신청 목록 페이지로 이동");
-        
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");

@@ -11,6 +11,7 @@ const { billAuth } = require('../middlewares/userAuth');
 // /bill/generator/create
 const router = express.Router();
 
+// 생성
 router.post('/create', verifyToken, async (req, res, next) => {
     try {
         const { billProject } = req.body;
@@ -71,10 +72,10 @@ router.post('/create', verifyToken, async (req, res, next) => {
         // 프로젝트 내역서 데이터 준비
         let thisBanks = await Load.findAll({ where: { billProject_id: billProject.id, type: 0 } });
         let thisGroups = await Load.findAll({ where: { billProject_id: billProject.id, type: 1 } });
-        let oneLoad = await Load.findAll({ where: { thisType: 0, billProject_id: billProject.id } });
-        let twoLoad = await Load.findAll({ where: { thisType: 1, billProject_id: billProject.id } });
-        let threeLoad = await Load.findAll({ where: { thisType: 2, billProject_id: billProject.id } });
-        let fourLoad = await Load.findAll({ where: { thisType: 3, billProject_id: billProject.id } });
+        let oneLoad = await Load.findAll({ where: { type: 2, thisType: 0, billProject_id: billProject.id } });
+        let twoLoad = await Load.findAll({ where: { type: 2, thisType: 1, billProject_id: billProject.id } });
+        let threeLoad = await Load.findAll({ where: { type: 2, thisType: 2, billProject_id: billProject.id } });
+        let fourLoad = await Load.findAll({ where: { type: 3, billProject_id: billProject.id } });
         let load6600 = await Load.findAll({ where: { volt: 6600, billProject_id: billProject.id } });
         let load3300 = await Load.findAll({ where: { volt: 3300, billProject_id: billProject.id } });
         let load440 = await Load.findAll({ where: { volt: 440, billProject_id: billProject.id } });

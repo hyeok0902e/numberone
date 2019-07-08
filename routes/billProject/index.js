@@ -34,8 +34,6 @@ router.get('/', verifyToken, async (req, res, next) => {
             where: { user_id: user.id, }, 
             attributes: ['id', 'name', 'createdAt', 'voltType', 'loadSimplyCE', 'outputCE', 'elecConvertVal', 'user_id'], 
         });
-        
-        if (billProjects.length == 0) { response(res, 404, "목록이 존재하지 않습니다."); return; }
 
         let payLoad = { billProjects };
         response(res, 200, '계산서 프로젝트 목록', payLoad);

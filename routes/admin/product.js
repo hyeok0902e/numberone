@@ -35,7 +35,7 @@ router.post('/fileUpload', verifyToken, verifyDuplicateLogin, verifyIsAdmin, upl
 // 제품 등록
 router.post('/', verifyToken, verifyDuplicateLogin, verifyIsAdmin, async (req, res, next) => {
     try {
-        const {products}= req.body;
+        const { products }= req.body;
 
         // 입력값 체크
         if (!products.name || !products.category || !products.ProductOpts || !products.ProductThumbs) { 

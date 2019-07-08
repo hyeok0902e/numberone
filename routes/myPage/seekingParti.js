@@ -24,7 +24,7 @@ router.get('/', verifyToken, verifyDuplicateLogin, async (req, res, next) => {
                 {
                     model: Labor,
                     order: [['id', 'ASC']], 
-                    limit: 1,
+                    limit: 2,
                 }
             ]
         });
@@ -46,7 +46,15 @@ router.get('/:seeking_id/list', verifyToken, verifyJobSearchAuth, verifyDuplicat
         const seeking = await Seeking.findOne({ where: { id: seeking_id } });
         if (!seeking) { response(res, 404, "구인 정보가 존재하지 않습니다."); return; }
 
-        const appliers = await seeking.getApplying();
+        const appliers = await seeking.getApplying({
+            include: [ 
+                {
+                    model: Labor,
+                    limit: 2,
+                    order: [['id', 'ASC']]
+                }
+            ]
+        });
         console.log(appliers.length)
         let payLoad = { appliers };
         response(res, 200, "신청자 목록", payLoad)   

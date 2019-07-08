@@ -15,8 +15,16 @@ const router = express.Router();
 router.get('/', verifyToken, verifyDuplicateLogin, verifyProductSeeAuth, async (req, res, next) => {
     try {   
         // 제품 목록(옵션, 사진 포함) 가져오기
-        const products = await Product.findAll({attributes: ['id', 'name', 'category'],
-        include: [{ model: ProductOpt, limit:1, attributes: ['price']}]})
+        const products = await Product.findAll({
+            attributes: ['id', 'name', 'category'],
+            include: [
+                { 
+                    model: ProductOpt, 
+                    limit:1, 
+                    attributes: ['price']
+                }
+            ]
+        });
         
         if (products.length > 0) {
             let payLoad = { products };
@@ -42,7 +50,7 @@ router.get('/:product_id/show', verifyToken, verifyDuplicateLogin, verifyProduct
             include: [{ model: UserAuth }], 
         });
 
-        const product = await Product.findOne({ where: { id: product_id, user_id: user.id } });
+        const product = await Product.findOne({ where: { id: product_id } });
         if (!product) { response(res, 404, "제품 없음"); return; }
 
         const productOpts = await ProductOpt.findAll({ where: { product_id: product.id } });
@@ -59,15 +67,13 @@ router.get('/:product_id/show', verifyToken, verifyDuplicateLogin, verifyProduct
 //장바구니에 등록
 router.post('/toBucket' ,verifyToken, verifyDuplicateLogin, verifyProductSeeAuth, async (req, res, next) => {
     try {
-        const {bucketProducts}= req.body;
+        const { bucketProducts }= req.body;
 
         // 입력값 체크
-        if (!bucketProducts.product_id ) { 
-            response(res, 400, "존재하지 않는 제품입니다."); 
-            return; 
-        }
+        if (!bucketProducts) { response(res, 400, "데이터 없음"); return; }
 
         let product = await Product.findOne({where: {id: bucketProducts.product_id}});
+        if (!product) { response(res, 400, "존재하지 않는 제품입니다."); return; } 
 
         const user = await User.findOne({ 
             where: { id: req.decoded.user_id }, 
@@ -75,13 +81,17 @@ router.post('/toBucket' ,verifyToken, verifyDuplicateLogin, verifyProductSeeAuth
         });
 
         // 유저 버켓에 들어가는 제품 생성
-        let bucketProduct = await BucketProduct.create({ name: product.name, category: product.category, product_id: product.id });
+        let bucketProduct = await BucketProduct.create({ 
+            name: product.name, category: product.category, product_id: product.id 
+        });
         await user.addBucketProduct(bucketProduct);
         
         // BucketProductOpt 생성
         if (bucketProducts.BucketProductOpts) {
             await asyncForEach(bucketProducts.BucketProductOpts, async (opt)=>{
-                let bucketProductOpt = await BucketProductOpt.create({ name: opt.name, price: opt.price, num: opt.num, totalPrice: opt.price * opt.num })
+                let bucketProductOpt = await BucketProductOpt.create({ 
+                    name: opt.name, price: opt.price, num: opt.num, totalPrice: opt.price * opt.num 
+                })
                 if(bucketProduct){
                     await bucketProduct.addBucketProductOpt(bucketProductOpt)
                     response(res, 201, "장바구니 담기 성공");
@@ -94,14 +104,11 @@ router.post('/toBucket' ,verifyToken, verifyDuplicateLogin, verifyProductSeeAuth
         else{
             response(res, 400, "에러: 제품 옵션 생성 실패");
         }
-
-
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러");
     }
 });
-
 
 
 // 제품 사진 등록
@@ -198,7 +205,7 @@ router.get('/:product_id/edit', verifyToken, verifyDuplicateLogin, verifyProduct
             include: [{ model: UserAuth }], 
         });
 
-        const product = await Product.findOne({ where: { id: product_id, user_id: user.id } });
+        const product = await Product.findOne({ where: { id: product_id } });
         if (!product) { response(res, 404, "제품 없음"); return; }
 
         const productOpts = await ProductOpt.findAll({ where: { product_id: product.id } });
@@ -219,11 +226,13 @@ router.put('/:product_id/edit', verifyToken, verifyDuplicateLogin, verifyProduct
         const {products} = req.body;
 
         //기존 제품과 연관 옵션 및 사진을 찾음
-        let product = await Product.findOne({where: {id : product_id},
+        let product = await Product.findOne({ 
+            where: { id : product_id} ,
             include: [
                 { model: ProductOpt }, 
                 { model: ProductThumb }
             ]});
+
             if(product){
                 await asyncForEach(product.ProductOpts, async(productOpt)=>{ //기존 연관 데이터를 삭제
                     productOpt.destroy()
@@ -288,24 +297,25 @@ router.put('/:product_id/edit', verifyToken, verifyDuplicateLogin, verifyProduct
 router.delete('/:product_id/delete', verifyToken, verifyDuplicateLogin, verifyProductSeeAuth, async (req, res, next) => {
     try {
         const { product_id } = req.params;
-        let product = await Product.findOne({where: {id : product_id},
+        let product = await Product.findOne({ 
+            where: { id : product_id },
             include: [
                 { model: ProductOpt }, 
                 { model: ProductThumb }
-            ]});
-            if(product){
-                product.destroy();
-                response(res, 201, "제품이 삭제되었습니다.");
-            }
-            else{
-                response(res, 404, "제품 없음");
-            }
+            ]
+        });
+
+        if(product){
+            product.destroy();
+            response(res, 201, "제품이 삭제되었습니다.");
+        }
+        else{
+            response(res, 404, "제품 없음");
+        }
     } catch (err) {
         console.log(err);
         response(res, 500, "서버 에러")
     }
 });
-
-
 
 module.exports = router;
