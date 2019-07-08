@@ -4,7 +4,8 @@
 	"description": "Electricity In NumberOne Node.js API Server For React.js",
 	"main": "app.js",
 	"scripts": {
-		"start": "nodemon app"
+		"start": "cross-env NODE_ENV=production PORT=80 pm2 start app.js",
+		"dev": "nodemon app"
 	},
 	"author": "hyeoke",
 	"license": "hyeoke",
