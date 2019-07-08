@@ -9,16 +9,16 @@ db.Sequelize = Sequelize;
 
 /******************************** Initialize (Start) ********************************/
 // 공통 및 기타
-// db.Address = require('./address')(sequelize, Sequelize);
-db.Announcement = require('./announcement')(sequelize, Sequelize);
+db.Address = require('./userModel/address')(sequelize, Sequelize);
+db.Announcement = require('./userModel/announcement')(sequelize, Sequelize);
 // 관리자
 db.StatementAdmin = require('./admin/statementAdmin')(sequelize, Sequelize);
 
 // User
-db.User = require('./user/user')(sequelize, Sequelize);
-db.Attendance = require('./user/attendance')(sequelize, Sequelize);
-db.UserPick = require('./user/userpick')(sequelize, Sequelize);
-db.UserAuth = require('./user/userauth')(sequelize, Sequelize);
+db.User = require('./userModel/user')(sequelize, Sequelize);
+db.Attendance = require('./userModel/attendance')(sequelize, Sequelize);
+db.UserPick = require('./userModel/userpick')(sequelize, Sequelize);
+db.UserAuth = require('./userModel/userauth')(sequelize, Sequelize);
 
 // BillProject
 db.BillProject = require('./billProject/billProject')(sequelize, Sequelize);
