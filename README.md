@@ -1,6 +1,9 @@
 # 전기인넘버원 Node.js Server API For React Application
     - 개발 시작일: 2019.05.17(금)
     - 문서(사용법) 기록 공간: Notion - TLSolution - TLS 프로젝트 목록
+    - (주)TL 외주 계약 프로젝트
+
+# 런칭 웹 URL: https://www.pvi.co.kr/
 
 ## 개발일지
 
